@@ -5,6 +5,12 @@
 #include <list>
 #include <optional>
 
+struct Task
+{
+    int id;
+    std::string description;
+    bool completion;
+};
 enum DetailType
 {
     basic,
@@ -23,6 +29,7 @@ void extraDetail(DetailType type);
 bool endErrorHandle(int argc,char* argv[],const std::vector<std::pair<int,std::string>>& orderedTasks);
 bool deleteErrorHandle(int argc,char* argv[],const std::vector<std::pair<int,std::string>>& orderedTasks);
 bool addErrorHandle(int argc);
+bool duplicateCheck(char* argv[],const std::vector<std::pair<int,std::string>>& orderedTasks);
 
 int main(const int argc,char* argv[])
 {
@@ -41,6 +48,7 @@ int main(const int argc,char* argv[])
     if (command == "add")
     {
         if (!addErrorHandle(argc)){return 1;}
+        if (duplicateCheck(argv,orderedTasks)){return 1;}
 
         addTask(argv,argc,orderedTasks);
     }
@@ -89,7 +97,7 @@ void deleteTask(std::vector<std::pair<int,std::string>>& orderedTasks,const char
     if (static_cast<std::string>(task) == "all")
     {
         std::remove("tasks.txt");
-        std::cout << "All the tasks have been successfully deleted!" << '\n';
+        std::cout << "All the tasks have been successfully deleted!" << "\n";
         return;
     }
 
@@ -106,7 +114,7 @@ void deleteTask(std::vector<std::pair<int,std::string>>& orderedTasks,const char
 
         else{myFile <<"[" << --pair.first << "] " << pair.second << '\n'; }
     }
-    std::cout << "The task has been successfully deleted!" << '\n';
+    std::cout << "The task has been successfully deleted!" << "\n";
 
     myFile.close();
 }
@@ -134,7 +142,7 @@ void endTask(const std::vector<std::pair<int,std::string>>& orderedTasks,const c
         }
         else{myFile <<"[" << pair.first << "] " << endedTask << '\n';}
     }
-    std::cout << "The status of the task has been successfully updated!" << '\n';
+    std::cout << "The status of the task has been successfully updated!" << "\n";
 
     myFile.close();
 }
@@ -142,17 +150,21 @@ void endTask(const std::vector<std::pair<int,std::string>>& orderedTasks,const c
 void addTask(char* argv[],int argc,const std::vector<std::pair<int,std::string>>& orderedTasks)
 {
     std::ofstream myFile("tasks.txt",std::ios::app);
+
     myFile <<"[" << orderedTasks.size() + 1 << "] ";
     for (int x{2}; x<argc ;++x)
     {
         myFile << argv[x] << " ";
     }
     myFile << "[-]" << '\n';
+
+    std::cout << "Task successfully added!" << "\n";
 }
 
 void listTasks()
 {
-    std::ifstream myFile("tasks.txt",std::ios::in);
+    std::ifstream myFile("tasks.txt");
+
     std::string task{};
 
     std::cout << '\n' << "X      X  XXXXX XXXXX" << '\n' <<
@@ -214,12 +226,12 @@ bool endErrorHandle(int argc,char* argv[],const std::vector<std::pair<int,std::s
 
         if (taskID < 1 || taskID > orderedTasks.size())
         {
-            std::cout << "The task ID is outside of the range! Introduce an ID for a task in the list!" << '\n';
+            std::cout << "The task ID is outside of the range! Introduce an ID for a task in the list!" << "\n";
             return false;
         }
     } catch (std::exception&) {
 
-        std::cout << "You must enter the ID of the task;anything else will lead to an error!" << '\n';
+        std::cout  << "You must enter the ID of the task;anything else will lead to an error!" << "\n";
         return false;
     }
 
@@ -250,12 +262,12 @@ bool deleteErrorHandle(int argc,char* argv[],const std::vector<std::pair<int,std
 
         if (taskID < 1 || taskID > orderedTasks.size())
         {
-            std::cout << "The task ID cannot be found! Introduce an ID for a task in the list!" << '\n';
+            std::cout << "The task ID cannot be found! Introduce an ID for a task in the list!" << "\n";
             return false;
         }
     } catch (const std::exception&) {
 
-        std::cout << "You must enter the ID of the task;anything else will lead to an error!" << '\n';
+        std::cout << "You must enter the ID of the task;anything else will lead to an error!" << "\n";
         return false;
 
     }
@@ -274,5 +286,29 @@ bool addErrorHandle(int argc)
     }
 
     return true;
+}
 
+bool duplicateCheck(char* argv[],const std::vector<std::pair<int,std::string>>& orderedTasks) {
+
+    bool isDuplicate{false};
+
+    const std::string taskName{argv[2]};
+
+    for (const auto& pair : orderedTasks) {
+        const std::size_t end{pair.second.find_last_of('[') - 1};
+
+        if (pair.second.substr(0,end)  == taskName){isDuplicate = true;}
+    }
+
+    if (isDuplicate)
+    {
+        char duplicateAnswer{};
+        std::cout << "There seems to be a task with the name just entered.Would you like to another task with the same name?(Y/n)";
+        std::cin >> duplicateAnswer;
+
+        if (duplicateAnswer == 'n' || duplicateAnswer == 'N' ){return true;}
+        else if (duplicateAnswer == 'Y' || duplicateAnswer == 'y'){return false;}
+    }
+
+    return false;
 }
