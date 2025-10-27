@@ -30,7 +30,8 @@ add_executable(task task.cpp
         TaskManager.cpp
         Calculations.h
         ErrorHandling.h
-        ErrorHandling.cpp)
+        ErrorHandling.cpp
+        Constants.h)
 
 # Link FTXUI libraries - use explicit target name
 target_link_libraries(task 
@@ -39,6 +40,7 @@ target_link_libraries(task
     ftxui::dom 
     ftxui::component
 )
+target_include_directories(task PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Set compiler flags
 target_compile_options(task PRIVATE

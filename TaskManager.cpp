@@ -1,5 +1,6 @@
-#include "TaskManager.h"
-#include "Calculations.h"
+#include <TaskManager.h>
+#include <Calculations.h>
+#include <Constants.h>
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -7,10 +8,12 @@
 #include <ftxui/component/screen_interactive.hpp>
 #include <ftxui/dom/elements.hpp>
 #include <ftxui/dom/table.hpp>
+#include <chrono>
+
 
 TaskManager::TaskManager()
 {
-    std::ifstream myFile("tasks.txt");
+    std::ifstream myFile(Constants::fileName);
 
     int count{0};
     std::string myTask{};
@@ -33,12 +36,12 @@ void TaskManager::deleteTask(const char* taskID)
 {
     if (static_cast<std::string>(taskID) == "all")
     {
-        std::remove("tasks.txt");
+        std::remove(Constants::fileName.c_str());
         std::cout << "All the tasks have been successfully deleted!" << "\n";
         return;
     }
 
-    std::ofstream myFile("tasks.txt",std::ios::out | std::ofstream::trunc);
+    std::ofstream myFile(Constants::fileName,std::ios::out | std::ofstream::trunc);
 
     int chosenTask{std::stoi(taskID)};
     --chosenTask; // Adjusting by one so that the index starts at one,not at zero
@@ -56,7 +59,7 @@ void TaskManager::deleteTask(const char* taskID)
 
 void TaskManager::endTask(const char* taskID,const char* status) const
 {
-    std::ofstream myFile("tasks.txt",std::ios::out | std::ofstream::trunc);
+    std::ofstream myFile(Constants::fileName,std::ios::out | std::ofstream::trunc);
 
     int chosenTask{std::stoi(taskID)};
     --chosenTask; // Adjusting by one so that the index starts at one,not at zero
@@ -80,20 +83,21 @@ void TaskManager::endTask(const char* taskID,const char* status) const
 
 void TaskManager::addTask(char* argv[],int argc) const
 {
-    std::ofstream myFile("tasks.txt",std::ios::app);
+    std::ofstream myFile(Constants::fileName,std::ios::app);
 
     myFile <<"[" << tasks.size() + 1 << "] ";
     for (int x{2}; x<argc ;++x)
     {
         myFile << argv[x] << " ";
     }
-    myFile << "[-]" << '\n';
+    myFile << "[" << Constants::ongoingMark << "]" << '\n';
 
     std::cout << "Task successfully added!" << "\n";
 }
+
 void TaskManager::changeTask(const char* taskID)
 {
-    std::ofstream myFile("tasks.txt",std::ios::out | std::ofstream::trunc);
+    std::ofstream myFile(Constants::fileName,std::ios::out | std::ofstream::trunc);
 
     int chosenTask{std::stoi(taskID)};
     --chosenTask; // Adjusting by one so that the index starts at one,not at zero
@@ -126,7 +130,7 @@ void TaskManager::changeTask(const char* taskID)
 void TaskManager::listTasks() {
 
     using namespace ftxui;
-    std::ifstream myFile("tasks.txt");
+    std::ifstream myFile(Constants::fileName);
 
     std::vector<Elements> tableContent{{text("ID") | bold | italic,
                                            text("Task") | bold | italic ,
@@ -141,13 +145,13 @@ void TaskManager::listTasks() {
         Elements values{};
         values.push_back(text(std::format("{}",task.id)) | bold );
 
-        if (task.completion == 'x')
+        if (task.completion == Constants::failureMark)
         {
             values.push_back(text(std::format("{}",task.description)) | bold | strikethrough);
             values.push_back(text(std::format("{}",task.completion)) | bold | color(Color::Red));
             ++cancelledTasks;
         }
-        else if (task.completion == '-')
+        else if (task.completion == Constants::ongoingMark)
         {
             values.push_back(text(std::format("{}",task.description)) | bold);
             values.push_back(text(std::format("{}",task.completion)) | bold | strikethrough );
@@ -193,11 +197,7 @@ void TaskManager::listTasks() {
 
     auto document = vbox(
         text(""),
-        paragraph(            "X      X  XXXXX XXXXX\n"
-                                       "X      X  X       X\n"
-                                       "X      X  XXXXX   X\n"
-                                       "X      X      X   X\n"
-                                       "XXXXX  X  XXXXX   X\n"   ) | bold | italic | color(Color::Gold1),
+        paragraph( Constants::listASCII) | bold | italic,
         text(""),
         renderedTable,
         completed,
@@ -206,54 +206,70 @@ void TaskManager::listTasks() {
         );
     auto screen = ftxui::Screen::Create(ftxui::Dimension::Fit(document,/*extend_beyond_screen=*/true),
                                        ftxui::Dimension::Fit(document,/*extend_beyond_screen=*/true));
+
     Render(screen, document);
     screen.Print();
     //std::cout << std::chrono::system_clock::now();
+
     std::cout << "\n\n";
 }
 
-void TaskManager::extraDetail(const DetailType type) const
-{
+void TaskManager::extraDetail(const DetailType type) const {
     using namespace ftxui;
 
+    Element document{};
     switch (type)
     {
         case basic: {
-            auto document = vbox(
+            document = vbox(
                 text(""),
-                paragraph(                            "XXXXX XXXXX XXXXX  X  XXXXX X   X XXXXX\n"
-                                                                "X   X X   X   X    X  X   X XX  X X\n"
-                                                                "X   X XXXXX   X    X  X   X X X X XXXXX\n"
-                                                                "X   X X       X    X  X   X X  XX     X\n"
-                                                                "XXXXX X       X    X  XXXXX X   X XXXXX\n") | bold,
+                paragraph(Constants::optionsASCII) ,
                 text(""),
-                text("[list] -- Presents the list of tasks")  | bold,
-                text("[add] -- Add a task")  | bold,
-                text("[end] -- Add a marker indicating completion,either success or failure")  | bold | strikethrough,
+                text("[list] -- Presents the list of tasks")  ,
+                text("[add] -- Add a task")  ,
+                text("[end] -- Add a marker indicating completion,either success or failure")  ,
                 text("[change] -- Change a task")  | bold,
-                text("[delete] -- Delete the task completely")  | bold
+                text("[info] -- Information regarding the to do app") ,
+                text("[delete] -- Delete the task completely")
             );
-
-            auto screen = Screen::Create(Dimension::Fit(document), Dimension::Fit(document));
-            Render(screen, document);
-            screen.Print();
-
-            std::cout << "\n\n";
-
             break;
         }
         case add:
-            std::cout << '\n' << "Task addition form: task add [description] " << "\n\n";
+        {
+            document = vbox(text(""),
+            text("Task addition form: task add [description] ")) ;
             break;
+        }
         case deletion:
-            std::cout << '\n' << "Task deletion form: task delete [ID] " << "\n\n";
+        {
+            document = vbox(text(""),
+            text("Task deletion form: task delete [ID] ")) ;
             break;
+        }
         case change:
-            std::cout << '\n' << "Task change form: task change [ID] " << "\n\n";
+        {
+            document = vbox(text(""),
+            text("Task deletion form: task change [ID] ")) ;
             break;
+        }
         case end:
-            std::cout << '\n' << "Task end form: task end [ID] [status] " << '\n'
-                      << "Status can be either x for failure,or s for success" << "\n\n";
+        {
+            document = vbox(text(""),
+            text("Task end form: task end [ID] [status] "),
+            text( " Status can be either x for failure,or s for success")) ;
+            break;
+        }
+        case info:
+            document = vbox(text(""),
+            paragraph("The purpose of the to do app is to log whatever task you would like to do.\n"
+                      "The app also tracks your progress;it allows you to change the tasks' description,to delete them if necessary,etc.\n"
+                      "Soon,I shall add further functionality,via date-keeping and -updating!")) ;
             break;
     }
+
+    document |= bold;
+    auto screen = Screen::Create(Dimension::Fit(document ), Dimension::Fit(document));
+    Render(screen, document);
+    screen.Print();
+    std::cout << "\n\n";
 }

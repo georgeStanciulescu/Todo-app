@@ -1,9 +1,17 @@
 #ifndef UNTITLED_ERRORHANDLING_H
 #define UNTITLED_ERRORHANDLING_H
-#include "TaskManager.h"
+#include <TaskManager.h>
 
 class ErrorHandling
 {
+public:
+    enum ErrorType
+    {
+        end,
+        deletion,
+        add,
+        change,
+    };
 private:
     const TaskManager& taskManager{};
 

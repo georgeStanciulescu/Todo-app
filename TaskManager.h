@@ -13,6 +13,7 @@ public:
         add,
         deletion,
         end,
+        info,
         change,
     };
 
@@ -29,7 +30,7 @@ private:
 public:
     TaskManager();
 
-    std::vector<Task> getTasks() const {return tasks;}
+    const std::vector<Task>& getTasks() const {return tasks;}
     void deleteTask(const char* taskID);
     void endTask(const char* taskID,const char* status) const;
     void addTask(char* argv[],int argc) const ;

@@ -1,4 +1,6 @@
-#include "ErrorHandling.h"
+#include <ErrorHandling.h>
+#include <Constants.h>
+#include <cstring>
 
 bool ErrorHandling::endErrorHandle(int argc,char* argv[]) const
 {
@@ -9,9 +11,15 @@ bool ErrorHandling::endErrorHandle(int argc,char* argv[]) const
     }
     if (!boundaryCheck(argv[2])){return false;}
 
-    const std::string_view statusType{(argv[3])};
+    if (std::strlen(argv[3]) != 1)
+    {
+        taskManager.extraDetail(TaskManager::end);
+        return false;
+    }
 
-    if (statusType != "s" && statusType != "x")
+    char statusType(argv[3][0]);
+
+    if (statusType != Constants::successMark && statusType != Constants::failureMark)
     {
         taskManager.extraDetail(TaskManager::end);
         return false;
@@ -27,7 +35,7 @@ bool ErrorHandling::deleteErrorHandle(int argc,char* argv[]) const
         taskManager.extraDetail(TaskManager::deletion);
         return false;
     }
-    const std::string_view deletionType{argv[2]};
+    std::string_view deletionType{argv[2]};
 
     if (deletionType == "all"){return true;}
 
@@ -62,10 +70,9 @@ bool ErrorHandling::changeErrorHandle(int argc,char* argv[]) const
 
 bool ErrorHandling::duplicateCheck(char* argv[]) const
 {
-
     bool isDuplicate{false};
 
-    const std::string taskName{argv[2]};
+    const std::string_view taskName{argv[2]};
 
     for (const auto& task : taskManager.getTasks()) {
         if (task.description == taskName){isDuplicate = true;}
@@ -104,3 +111,7 @@ bool ErrorHandling::boundaryCheck(const char* argv) const
 
     return true;
 }
+
+// void errorResponse()
+// {
+// using namespace ftxui;}

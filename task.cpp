@@ -3,14 +3,14 @@
 #include <fstream>
 #include <ftxui/component/screen_interactive.hpp>
 #include <chrono>
-#include "TaskManager.h"
-#include "ErrorHandling.h"
+#include <TaskManager.h>
+#include <ErrorHandling.h>
 
 int main(const int argc,char* argv[])
 {
     TaskManager tasker{};
     const ErrorHandling validator{tasker};
-    
+
     if (argc < 2)
     {
         tasker.extraDetail(TaskManager::basic);
@@ -49,6 +49,11 @@ int main(const int argc,char* argv[])
         if (!validator.changeErrorHandle(argc,argv)){return 1;}
 
         tasker.changeTask(argv[2]);
+    }
+
+    if (command == "info")
+    {
+        tasker.extraDetail(TaskManager::info);
     }
 
     return 0;
