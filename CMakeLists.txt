@@ -25,7 +25,12 @@ if(NOT ftxui_FOUND)
     endif()
 endif()
 
-add_executable(task task.cpp)
+add_executable(task task.cpp
+        TaskManager.h
+        TaskManager.cpp
+        Calculations.h
+        ErrorHandling.h
+        ErrorHandling.cpp)
 
 # Link FTXUI libraries - use explicit target name
 target_link_libraries(task 
