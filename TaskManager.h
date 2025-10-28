@@ -15,6 +15,7 @@ public:
         end,
         info,
         change,
+        list,
     };
 
 private:
@@ -32,8 +33,8 @@ public:
 
     const std::vector<Task>& getTasks() const {return tasks;}
     void deleteTask(const char* taskID);
-    void endTask(const char* taskID,const char* status) const;
-    void addTask(char* argv[],int argc) const ;
+    void endTask(const char* taskID,const char* status);
+    void addTask(char* argv[],int argc);
     void changeTask(const char* taskID);
     void listTasks();
     void extraDetail(DetailType type) const ;

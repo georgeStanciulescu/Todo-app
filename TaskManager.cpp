@@ -57,7 +57,7 @@ void TaskManager::deleteTask(const char* taskID)
     myFile.close();
 }
 
-void TaskManager::endTask(const char* taskID,const char* status) const
+void TaskManager::endTask(const char* taskID,const char* status)
 {
     std::ofstream myFile(Constants::fileName,std::ios::out | std::ofstream::trunc);
 
@@ -81,7 +81,7 @@ void TaskManager::endTask(const char* taskID,const char* status) const
     myFile.close();
 }
 
-void TaskManager::addTask(char* argv[],int argc) const
+void TaskManager::addTask(char* argv[],int argc)
 {
     std::ofstream myFile(Constants::fileName,std::ios::app);
 
@@ -264,6 +264,8 @@ void TaskManager::extraDetail(const DetailType type) const {
             paragraph("The purpose of the to do app is to log whatever task you would like to do.\n"
                       "The app also tracks your progress;it allows you to change the tasks' description,to delete them if necessary,etc.\n"
                       "Soon,I shall add further functionality,via date-keeping and -updating!")) ;
+            break;
+        case list:
             break;
     }
 

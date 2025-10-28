@@ -31,7 +31,9 @@ add_executable(task task.cpp
         Calculations.h
         ErrorHandling.h
         ErrorHandling.cpp
-        Constants.h)
+        Constants.h
+        ProgramLogic.h
+        ProgramLogic.cpp)
 
 # Link FTXUI libraries - use explicit target name
 target_link_libraries(task 

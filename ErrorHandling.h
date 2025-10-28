@@ -4,14 +4,6 @@
 
 class ErrorHandling
 {
-public:
-    enum ErrorType
-    {
-        end,
-        deletion,
-        add,
-        change,
-    };
 private:
     const TaskManager& taskManager{};
 
@@ -21,13 +13,17 @@ public:
     {
     }
 
-    bool endErrorHandle(int argc,char* argv[]) const;
-    bool deleteErrorHandle(int argc,char* argv[]) const;
-    bool addErrorHandle(int argc) const;
-    bool changeErrorHandle(int argc,char* argv[]) const;
+    [[nodiscard]] bool programStartHandle(int totalArgs) const;
+    bool endErrorHandle(int totalArgs,char* endArgs[]) const;
+    [[nodiscard]] bool deleteErrorHandle(int totalArgs,char* deletionArg[]) const;
+    [[nodiscard]] bool addErrorHandle(int totalArgs) const;
+    [[nodiscard]] bool changeErrorHandle(int totalArgs,char* changeArg[]) const;
 
-    bool duplicateCheck(char* argv[]) const;
-    bool boundaryCheck(const char* argv) const;
+    [[nodiscard]] bool duplicateCheck(const char* duplicateArg);
+    [[nodiscard]] bool userWantsDuplicate(bool isDuplicate);
+    [[nodiscard]] bool boundaryCheck(const char* boundaryArg) const;
+
+    [[nodiscard]] bool errorResponse(TaskManager::DetailType type) const;
 
 };
 
