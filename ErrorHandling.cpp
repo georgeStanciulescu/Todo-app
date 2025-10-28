@@ -1,6 +1,8 @@
 #include <ErrorHandling.h>
 #include <Constants.h>
 
+#include "Interface.h"
+
 
 bool ErrorHandling::endErrorHandle(const int totalArgs,char* endArgs[]) const
 {
@@ -99,7 +101,7 @@ bool ErrorHandling::programStartHandle(const int totalArgs) const
 
 bool ErrorHandling::errorResponse(const TaskManager::DetailType type) const
 {
-    taskManager.extraDetail(type);
+    extraDetail(type);
     return false;
 }
 

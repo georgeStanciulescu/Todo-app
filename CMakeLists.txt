@@ -33,7 +33,13 @@ add_executable(task task.cpp
         ErrorHandling.cpp
         Constants.h
         ProgramLogic.h
-        ProgramLogic.cpp)
+        ProgramLogic.cpp
+        FileIO.h
+        FileIO.cpp
+        Interface.h
+        Interface.cpp
+        InterfaceComposition.h
+        InterfaceComposition.cpp)
 
 # Link FTXUI libraries - use explicit target name
 target_link_libraries(task 

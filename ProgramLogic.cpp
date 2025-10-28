@@ -2,6 +2,8 @@
 #include <TaskManager.h>
 #include <ErrorHandling.h>
 
+#include "Interface.h"
+
 ProgramResult programLogic(const int argc,char* argv[])
 {
     using enum TaskManager::DetailType;
@@ -17,7 +19,7 @@ ProgramResult programLogic(const int argc,char* argv[])
     auto choice = commandChoice(input);
     if (!choice)
     {
-        tasker.extraDetail(basic);
+        extraDetail(basic);
         return failure;
     }
 
@@ -32,27 +34,32 @@ ProgramResult programLogic(const int argc,char* argv[])
             if (!validator.duplicateCheck(argv[2])){return failure;}
 
             tasker.addTask(argv,argc);
+            successMessage(add);
             break;
         case deletion:
             if (!validator.deleteErrorHandle(argc,argv)){return failure;}
 
-            tasker.deleteTask(argv[2]);
+            tasker.deleteTask(argv[2]) == TaskManager::all ? successMessage(deletion,true) :successMessage(deletion);
+
             break;
         case end:
             if (!validator.endErrorHandle(argc,argv)){return failure;}
 
             tasker.endTask(argv[2],argv[3]);
+            successMessage(end);
             break;
         case change:
             if (!validator.changeErrorHandle(argc,argv)){return failure;}
 
             tasker.changeTask(argv[2]);
+            successMessage(change);
             break;
         case info:
-            tasker.extraDetail(info);
+            extraDetail(info);
             break;
         case basic:
-            tasker.extraDetail(basic);
+            extraDetail(basic);
+            break;
     }
 
     return success;
