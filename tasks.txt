@@ -2,3 +2,4 @@
 [2] comotda [-]
 [3] mancare [-]
 [4] stomacheala [-]
+[5] smoc [-]

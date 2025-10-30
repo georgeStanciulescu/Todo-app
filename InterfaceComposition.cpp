@@ -18,7 +18,8 @@ namespace InterfaceComposition
 
         std::vector<Elements> tableContent{{ text("ID") | bold | italic,
                                                 text("Task") | bold | italic ,
-                                                text("Status") | bold | italic }};
+                                                text("Status") | bold | italic,
+                                                text("Date started") | bold | italic}};
 
 
         tableDataCalculations(tasks,tableContent);
@@ -37,25 +38,30 @@ namespace InterfaceComposition
         {
             Elements values{};
             values.push_back(text(std::format("{}",task.id)) | bold );
+            //can be simplified,since std::format is not needed for all
 
             if (task.completion == Constants::failureMark)
             {
-                values.push_back(text(std::format("{}",task.description)) | bold | strikethrough);
+                values.push_back(paragraph(std::format("{}",task.description)) | bold | strikethrough);
                 values.push_back(text(std::format("{}",task.completion)) | bold | color(Color::Red));
+                task.date.size() == 0 ? values.push_back(text(task.date) | bold | strikethrough) : values.push_back(text(task.date) | bold);
             }
             else if (task.completion == Constants::ongoingMark)
             {
-                values.push_back(text(std::format("{}",task.description)) | bold);
+                values.push_back(paragraph(std::format("{}",task.description)) | bold);
                 values.push_back(text(std::format("{}",task.completion)) | bold | strikethrough );
+                task.date.size() == 0 ? values.push_back(text(task.date) | bold | strikethrough) : values.push_back(text(task.date) | bold);
             }
             else
             {
-                values.push_back(text(std::format("{}",task.description)) | bold );
+                values.push_back(paragraph(std::format("{}",task.description)) | bold );
                 values.push_back(text(std::format("{}",task.completion)) | bold | color(Color::Green));
+                task.date.size() == 0 ? values.push_back(text(task.date) | bold | strikethrough) : values.push_back(text(task.date) | bold);
             }
 
             tableContent.push_back(values);
         }
+
     }
 
     void tableLookInfo(ftxui::Table& table)
@@ -66,6 +72,7 @@ namespace InterfaceComposition
 
         table.SelectColumn(0).Border(LIGHT);
         table.SelectColumn(1).Border(LIGHT);
+        table.SelectColumn(2).Border(LIGHT);
 
         table.SelectRow(0).Border(LIGHT);
         table.SelectColumn(2).DecorateCells(center);

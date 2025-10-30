@@ -39,7 +39,11 @@ add_executable(task task.cpp
         Interface.h
         Interface.cpp
         InterfaceComposition.h
-        InterfaceComposition.cpp)
+        InterfaceComposition.cpp
+        Date.h
+        Date.cpp)
+
+set(CMAKE_BUILD_TYPE Debug)
 
 # Link FTXUI libraries - use explicit target name
 target_link_libraries(task 

@@ -4,6 +4,11 @@
 
 class ErrorHandling
 {
+public:
+    enum ErrorType
+    {
+        outOfRange,
+    };
 private:
     const TaskManager& taskManager{};
 
@@ -20,10 +25,7 @@ public:
     [[nodiscard]] bool changeErrorHandle(int totalArgs,char* changeArg[]) const;
 
     [[nodiscard]] bool duplicateCheck(const char* duplicateArg);
-    [[nodiscard]] bool userWantsDuplicate(bool isDuplicate);
     [[nodiscard]] bool boundaryCheck(const char* boundaryArg) const;
-
-    [[nodiscard]] bool errorResponse(TaskManager::DetailType type) const;
 
 };
 

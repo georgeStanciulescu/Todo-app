@@ -1,3 +1,4 @@
+#include <chrono>
 #include <ProgramLogic.h>
 #include <TaskManager.h>
 #include <ErrorHandling.h>
@@ -8,6 +9,7 @@ ProgramResult programLogic(const int argc,char* argv[])
 {
     using enum TaskManager::DetailType;
     using enum ProgramResult;
+    using namespace Interface;
 
     TaskManager tasker{};
     ErrorHandling validator{tasker};
@@ -31,7 +33,7 @@ ProgramResult programLogic(const int argc,char* argv[])
             break;
         case add:
             if (!validator.addErrorHandle(argc)){return failure;}
-            if (!validator.duplicateCheck(argv[2])){return failure;}
+            if (!tasker.duplicateCheck(argv[2])){return failure;}
 
             tasker.addTask(argv,argc);
             successMessage(add);

@@ -5,43 +5,58 @@
 #include <Interface.h>
 #include <filesystem>
 
+#include "Date.h"
+
 TaskManager::TaskManager()
 {
-    fileIO(tasks);
+    IO::fileIO(tasks);
 }
 
 TaskManager::DeletionType TaskManager::deleteTask(const char* taskID)
 {
     if (std::string_view(taskID) == "all")
     {
-        deleteAllTasksIO();
+        IO::deleteAllTasksIO();
         return all;
     }
 
-    deleteTaskIO(tasks,taskID);
+    IO::deleteTaskIO(tasks,taskID);
     return single;
 }
 
 void TaskManager::endTask(const char* taskID,const char* status)
 {
-    endTaskIO(tasks,taskID,status);
+    IO::endTaskIO(tasks,taskID,status);
 }
 
 void TaskManager::addTask(char* argv[],int argc)
 {
-    addTaskIO(tasks,argv,argc);
+    IO::addTaskIO(tasks,argv,argc);
+    //dateDropdown();
 }
 
 void TaskManager::changeTask(const char* taskID)
 {
-    changeTaskIO(tasks,taskID);
+    IO::changeTaskIO(tasks,taskID);
 }
 
 void TaskManager::listTasks()
 {
-    displayTotalList(tasks);
+    Interface::displayTotalList(tasks);
 }
 
+bool TaskManager::duplicateCheck(const char* duplicateArg)
+
+{
+    bool isDuplicate{false};
+
+    for (const auto& task : tasks) {
+
+        if (task.description == std::string_view(duplicateArg)){isDuplicate = true;}
+    }
+
+    return Interface::userWantsDuplicate(isDuplicate);
+}
 
 
 

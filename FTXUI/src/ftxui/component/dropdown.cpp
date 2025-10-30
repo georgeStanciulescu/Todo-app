@@ -62,6 +62,8 @@ Component Dropdown(DropdownOption option) {
       const int selected_old = selected_();
       bool handled = ComponentBase::OnEvent(event);
 
+
+
       // Transfer focus to the radiobox when the dropdown is opened.
       if (!open_old && open_()) {
         radiobox_->TakeFocus();
@@ -85,6 +87,10 @@ Component Dropdown(DropdownOption option) {
         }
       }
 
+        // if (!open_old && open_()) {
+        //     radiobox_->TakeFocus();
+        //     handled = true;
+        // }
       return handled;
     }
 

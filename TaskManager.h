@@ -26,18 +26,20 @@ public:
         int id;
         std::string description;
         char completion;
+        std::string date;
     };
 private:
     std::vector<Task> tasks{};
 public:
     TaskManager();
 
-    const std::vector<Task>& getTasks() const {return tasks;}
+    [[nodiscard]] const std::vector<Task>& getTasks() const {return tasks;}
     DeletionType deleteTask(const char* taskID);
     void endTask(const char* taskID,const char* status);
     void addTask(char* argv[],int argc);
     void changeTask(const char* taskID);
     void listTasks();
+    bool duplicateCheck(const char* duplicateArg);
 
 };
 #endif //UNTITLED_TASKMANAGER_H
