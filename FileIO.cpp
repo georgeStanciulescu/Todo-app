@@ -5,8 +5,12 @@
 #include <ftxui/component/screen_interactive.hpp>
 #include <ftxui/dom/elements.hpp>
 #include <ftxui/dom/table.hpp>
+#include <chrono>
+#include <sstream>
+#include <iostream>
 
 
+#include "Calculations.h"
 #include "Date.h"
 #include "Interface.h"
 #include "TaskManager.h"
@@ -24,9 +28,7 @@ namespace IO {
 
         std::ifstream myFile(Constants::fileName);
 
-        if (!myFile) {
-            throw std::runtime_error("Error : The file has failed to open!");
-        }
+        if (!myFile) {throw std::runtime_error("Error : The file has failed to open!");}
 
         int count{0};
         std::string myTask{};
@@ -35,13 +37,17 @@ namespace IO {
             std::size_t openBrace{myTask.find_first_of('{')};
             std::size_t closeBrace{myTask.find_first_of('}')};
             std::size_t openBracket{myTask.find_first_of('[')};
+            std::size_t closeBracket{myTask.find_first_of(']')};
+            std::size_t openBraceLast{myTask.find_last_of('{')};
 
             ++count;
 
-            tasks.emplace_back(count,
-                                myTask.substr(openBrace+1,closeBrace-3),
-                                myTask[closeBrace+1],
-                                myTask.substr(openBracket+1));
+            tasks.emplace_back(  count,
+                          myTask.substr(openBrace + 1,closeBrace-openBrace -1),
+                           myTask[closeBrace+1],
+                                myTask.substr(openBracket + 1,closeBracket -openBracket - 1),
+                             myTask.substr(closeBracket + 1,openBraceLast - closeBracket - 1),
+                            myTask.substr(openBraceLast + 1));
         }
         myFile.close();
     }
@@ -59,8 +65,8 @@ namespace IO {
         tasks.erase(tasks.begin() + chosenTask);
 
         for (std::size_t x{0}; x < tasks.size(); ++x) {
-            tempFile  << x + 1 << "{" << tasks[x].description << "}" <<
-                    tasks[x].completion << "[" << tasks[x].date <<'\n';
+            tempFile  << x + 1 << '{' << tasks[x].description << '}' <<
+                    tasks[x].completion << '[' << tasks[x].date << "]" <<tasks[x].dueDate << '{' << tasks[x].daysLeft << '\n';
         }
 
         std::filesystem::rename(tempPath,Constants::fileName);
@@ -82,11 +88,11 @@ namespace IO {
 
         for (const auto &task: tasks) {
             if (task.id != chosenTask) {
-                tempFile  << task.id << "{" << task.description << "}" <<
-                        task.completion << "[" << task.date << '\n';
+                tempFile  << task.id << '{' << task.description << '}' <<
+                        task.completion << '[' << task.date << ']' << task.dueDate << '{' << task.daysLeft <<  '\n';
             } else {
-                tempFile << task.id << "{" << endedTask << "}" << status
-                         << "[" << task.date << '\n';
+                tempFile << task.id << '{' << endedTask << '}' << status
+                         << '[' << task.date << ']' << task.dueDate << '{' << task.daysLeft << '\n';
             }
         }
 
@@ -96,16 +102,22 @@ namespace IO {
     void addTaskIO(const std::vector<TaskManager::Task> &tasks, char *argv[],
                    int argc) {
 
+        using namespace std::chrono;
         //std::filesystem::path tempPath{"temp.txt"};
         std::ofstream tempFile(Constants::fileName, std::ios::app);
 
-        std::string_view presentDate{dateDropdown()};
+        auto dates = dateDropdown();
+
+        auto startDate = std::format("{}/{}/{}",dates[0].day ,dates[0].month ,dates[0].year);
+        auto endDate = std::format("{}/{}/{}",dates[1].day,dates[1].month ,dates[1].year);
+
+        int daysLeft {presentToDueDate(dates[1])};
 
         tempFile << tasks.size() + 1 << "{";
         for (int x{2}; x < argc; ++x) {
-            tempFile << argv[x] << " ";
+            tempFile << argv[x] ;
         }
-        tempFile << "}" << Constants::ongoingMark << "[" << presentDate << '\n';
+        tempFile << "}" << Constants::ongoingMark << "[" << startDate << "]" << endDate << "{" << daysLeft << '\n';
 
         //std::filesystem::rename(tempPath,Constants::fileName);
     }
@@ -127,9 +139,9 @@ namespace IO {
         tasks[chosenTask].description = descriptionToChange;
 
         // //id{description}status
-        for (auto &task: tasks) {
-            tempFile << task.id << "{" << task.description << "}" << task
-                    .completion << "[" << task.date << '\n';
+        for (const auto &task: tasks) {
+            tempFile << task.id << '{' << task.description << '}' << task
+                    .completion << '[' << task.date << ']' << task.dueDate << '{' << task.daysLeft << '\n';
         }
 
         std::filesystem::rename(tempPath,Constants::fileName);

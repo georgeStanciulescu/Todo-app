@@ -18,6 +18,7 @@ namespace Interface
     bool errorResponse(TaskManager::DetailType type);
     void exceptionErrorMessage(ErrorHandling::ErrorType type);
 
+
 }
 
 

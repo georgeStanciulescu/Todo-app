@@ -16,11 +16,15 @@ namespace InterfaceComposition
     {
         using namespace ftxui;
 
-        std::vector<Elements> tableContent{{ text("ID") | bold | italic,
-                                                text("Task") | bold | italic ,
-                                                text("Status") | bold | italic,
-                                                text("Date started") | bold | italic}};
-
+        std::vector<Elements> tableContent{
+                {
+                    text("ID") | bold | italic,
+                       text("Task") | bold | italic ,
+                       text("Status") | bold | italic,
+                       text("Date started") | bold | italic,
+                       text("Due date") | bold | italic,
+                       text("Days left") | bold | italic
+                }};
 
         tableDataCalculations(tasks,tableContent);
 
@@ -37,27 +41,10 @@ namespace InterfaceComposition
         for (auto& task : tasks)
         {
             Elements values{};
-            values.push_back(text(std::format("{}",task.id)) | bold );
-            //can be simplified,since std::format is not needed for all
 
-            if (task.completion == Constants::failureMark)
-            {
-                values.push_back(paragraph(std::format("{}",task.description)) | bold | strikethrough);
-                values.push_back(text(std::format("{}",task.completion)) | bold | color(Color::Red));
-                task.date.size() == 0 ? values.push_back(text(task.date) | bold | strikethrough) : values.push_back(text(task.date) | bold);
-            }
-            else if (task.completion == Constants::ongoingMark)
-            {
-                values.push_back(paragraph(std::format("{}",task.description)) | bold);
-                values.push_back(text(std::format("{}",task.completion)) | bold | strikethrough );
-                task.date.size() == 0 ? values.push_back(text(task.date) | bold | strikethrough) : values.push_back(text(task.date) | bold);
-            }
-            else
-            {
-                values.push_back(paragraph(std::format("{}",task.description)) | bold );
-                values.push_back(text(std::format("{}",task.completion)) | bold | color(Color::Green));
-                task.date.size() == 0 ? values.push_back(text(task.date) | bold | strikethrough) : values.push_back(text(task.date) | bold);
-            }
+            if (task.completion == Constants::failureMark){fillTableValues(task,values,Color::Red);}
+            else if (task.completion == Constants::ongoingMark)  {fillTableValues(task,values,Color::Default);}
+            else{fillTableValues(task,values,Color::Green);}
 
             tableContent.push_back(values);
         }
@@ -70,14 +57,16 @@ namespace InterfaceComposition
 
         table.SelectAll().Border(LIGHT);
 
-        table.SelectColumn(0).Border(LIGHT);
-        table.SelectColumn(1).Border(LIGHT);
-        table.SelectColumn(2).Border(LIGHT);
+        for (int x{0}; x < 5;++x) {
+            table.SelectColumn(x).Border(LIGHT);
+        }
 
         table.SelectRow(0).Border(LIGHT);
+        table.SelectColumn(5).DecorateCells(center);
         table.SelectColumn(2).DecorateCells(center);
     }
 
+    //The gauges do not use dividingTasks() because there is no difference to their appearance if totalTasks is zero
     ftxui::Element progressBarCreation(const std::vector<TaskManager::Task>& tasks) {
 
         using namespace ftxui;
@@ -91,24 +80,35 @@ namespace InterfaceComposition
             else if (task.completion == Constants::ongoingMark) {++runningTasks;}
             else{++successTasks;}
         }
-        float totalTasks{successTasks + runningTasks + cancelledTasks};
+        const float totalTasks{successTasks + runningTasks + cancelledTasks};
 
-        auto completed = hbox(
-            window(text("Completed") | bold | italic,text(std::format("{}%",dividingTasks(successTasks,totalTasks ) * 100)) | bold),
-            gauge(successTasks/totalTasks) | bold | color(Color::DarkGreen )| border
-            );
+        auto hboxCreator = [&](const std::string& label,const float value,const Color& colour) {
+                return hbox(
+                    window(text(label) | bold | italic,
+                        text(std::format("{}%",dividingTasks(value,totalTasks)* 100)) | bold),
+                        gauge(dividingTasks(value,totalTasks)) | bold | color(colour) | border
+                );
+        };
 
-        auto uncompleted = hbox(
-            window(text("Unfinished") | bold | italic,text(std::format("{}%",dividingTasks(runningTasks,totalTasks ) * 100)) | bold ),
-            gauge(runningTasks/totalTasks) | bold | color(Color::NavajoWhite1) | border
-        );
-
-        auto failed = hbox(
-            window(text("Failed") | bold | italic,text(std::format("{}%",dividingTasks(cancelledTasks,totalTasks ) * 100)) | bold),
-            gauge(cancelledTasks/totalTasks) | bold | color(Color::Red) | border
-
-        );
+        const auto completed = hboxCreator("Completed",successTasks,Color::DarkGreen);
+        const auto uncompleted = hboxCreator("Unfinished",runningTasks,Color::NavajoWhite1);
+        const auto failed = hboxCreator("Failed",cancelledTasks,Color::Red);
 
         return vbox(completed,uncompleted,failed);
     }
+
+    void fillTableValues(const TaskManager::Task& task,ftxui::Elements& values,const ftxui::Color& colour)
+    {
+        using namespace ftxui;
+
+        values.push_back(text(std::format("{}",task.id)) | bold );
+        colour == Color::Default ? values.push_back(paragraph(task.description) | bold )
+                                    : values.push_back(paragraph(task.description) | bold | strikethrough);
+        values.push_back(text(std::format("{}",task.completion)) | bold | color(colour));
+        values.push_back(text(task.date) | bold);
+        values.push_back(text(task.dueDate) | bold);
+        colour == Color::Default ? values.push_back(text(task.daysLeft) | bold)
+                                    : values.push_back(text(task.daysLeft) | bold | strikethrough | color(colour));
+    }
 }
+

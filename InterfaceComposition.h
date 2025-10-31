@@ -10,16 +10,11 @@
 namespace InterfaceComposition
 {
     ftxui::Element makeVbox(const std::string& first);
-
     ftxui::Element listTableCreation(const std::vector<TaskManager::Task>& tasks);
     void tableDataCalculations(const std::vector<TaskManager::Task>& tasks,std::vector<ftxui::Elements>& tableContent);
     void tableLookInfo(ftxui::Table& table);
-
     ftxui::Element progressBarCreation(const std::vector<TaskManager::Task>& tasks);
-
+    void fillTableValues(const TaskManager::Task& task,ftxui::Elements& values,const ftxui::Color& colour);
 }
-
-
-
 
 #endif //UNTITLED_INTERFACECOMPOSITION_H

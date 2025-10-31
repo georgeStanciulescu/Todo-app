@@ -169,6 +169,7 @@ namespace Interface {
             table,
             progressBar
         ));
+
     }
 
     bool errorResponse(const TaskManager::DetailType type) {

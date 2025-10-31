@@ -27,6 +27,8 @@ public:
         std::string description;
         char completion;
         std::string date;
+        std::string dueDate;
+        std::string daysLeft;
     };
 private:
     std::vector<Task> tasks{};
