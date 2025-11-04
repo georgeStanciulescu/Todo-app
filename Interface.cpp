@@ -1,14 +1,9 @@
 #include <Interface.h>
 #include <Constants.h>
-
-#include "Calculations.h"
-#include "ErrorHandling.h"
-#include "InterfaceComposition.h"
-#include "TaskManager.h"
+#include <InterfaceComposition.h>
 #include "ftxui/component/component.hpp"
-#include "ftxui/component/event.hpp"
 #include "ftxui/component/screen_interactive.hpp"
-#include "ftxui/dom/table.hpp"
+#include <iostream>
 
 namespace Interface {
 
@@ -71,7 +66,7 @@ namespace Interface {
         }
     }
 
-    void successMessage(TaskManager::DetailType type, bool deleteAll) {
+    void successMessage(const TaskManager::DetailType type,const bool deleteAll) {
         using enum TaskManager::DetailType;
         using namespace InterfaceComposition;
         switch (type) {
@@ -97,7 +92,7 @@ namespace Interface {
         }
     }
 
-    void exceptionErrorMessage(ErrorHandling::ErrorType type) {
+    void exceptionErrorMessage(const ErrorHandling::ErrorType type) {
         using enum ErrorHandling::ErrorType;
         using namespace InterfaceComposition;
 
@@ -121,6 +116,20 @@ namespace Interface {
         screen.Print();
 
         std::cout << '\n';
+    }
+
+    void displayText(const ftxui::Component& printedText) {
+        using namespace ftxui;
+
+        auto document = printedText;
+        auto screen = ScreenInteractive::TerminalOutput();
+
+        auto container = Container::Vertical({document});
+
+        //Render(screen, document);
+        screen.Loop(container);
+
+        //std::cout << '\n';
     }
 
     void changeTaskInput(std::string &descriptionToChange) {
@@ -162,18 +171,18 @@ namespace Interface {
         Element table{InterfaceComposition::listTableCreation(tasks)};
         Element progressBar{InterfaceComposition::progressBarCreation(tasks)};
 
-        displayText(vbox(
-            text(""),
-            paragraph(Constants::listASCII) | bold | italic,
-            text(""),
-            table,
-            progressBar
-        ));
+         displayText(vbox(
+             text(""),
+             paragraph(Constants::listASCII) | bold | italic,
+             text(""),
+             table,
+             progressBar | size(HEIGHT,EQUAL,10)
+         ));
 
     }
 
     bool errorResponse(const TaskManager::DetailType type) {
-        Interface::extraDetail(type);
+        extraDetail(type);
         return false;
     }
 }

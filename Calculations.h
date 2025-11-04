@@ -2,6 +2,7 @@
 #ifndef UNTITLED_CALCULATIONS_H
 #define UNTITLED_CALCULATIONS_H
 #include "Date.h"
+#include <iostream>
 
 constexpr float dividingTasks(const float x,const float y)
 {
@@ -28,7 +29,20 @@ inline int presentToDueDate(const DateInformation::DayMonthYear& endDate)
 
     const auto dayDifference = dueDate - presentDate;
 
-    std::cout << "FROM THE CALCULATE DATE FUNCTION DIRECTLY,THE DIFFERENCE IS: " << dayDifference << '\n';
+    //std::cout << "FROM THE CALCULATE DATE FUNCTION DIRECTLY,THE DIFFERENCE IS: " << dayDifference << '\n';
+
+    return static_cast<int>(dayDifference.count());
+
+}
+
+inline int returnDateDifference(const DateInformation::DayMonthYear& start,const DateInformation::DayMonthYear& end)
+{
+    const auto startDate = returnChronoDate(start);
+    const auto dueDate = returnChronoDate(end);
+
+    const auto dayDifference = dueDate - startDate;
+
+    //std::cout << "FROM THE CALCULATE DATE FUNCTION DIRECTLY,THE DIFFERENCE IS: " << dayDifference << '\n';
 
     return static_cast<int>(dayDifference.count());
 

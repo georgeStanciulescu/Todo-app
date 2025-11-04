@@ -3,6 +3,7 @@ project(untitled)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+
 find_package(ftxui QUIET)
 if(NOT ftxui_FOUND)
     # Check if FTXUI directory exists locally

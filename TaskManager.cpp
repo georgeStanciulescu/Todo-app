@@ -1,11 +1,7 @@
 #include <TaskManager.h>
-#include <Calculations.h>
-#include <Constants.h>
 #include <FileIO.h>
 #include <Interface.h>
-#include <filesystem>
 
-#include "Date.h"
 
 TaskManager::TaskManager()
 {
@@ -24,9 +20,9 @@ TaskManager::DeletionType TaskManager::deleteTask(const char* taskID)
     return single;
 }
 
-void TaskManager::endTask(const char* taskID,const char* status)
+void TaskManager::endTask(const char* taskID,const char* status,const std::string& startDate)
 {
-    IO::endTaskIO(tasks,taskID,status);
+    IO::endTaskIO(tasks,taskID,status,startDate);
 }
 
 void TaskManager::addTask(char* argv[],int argc)

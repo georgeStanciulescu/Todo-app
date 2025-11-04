@@ -1,72 +1,128 @@
 #ifndef UNTITLED_DATE_H
 #define UNTITLED_DATE_H
 
-#include "ftxui/component/captured_mouse.hpp"  // for ftxui
-#include "ftxui/component/component.hpp"  // for Dropdown, Horizontal, Vertical
-#include "ftxui/component/screen_interactive.hpp"  // for ScreenInteractive
-#include <chrono>
+#include "ftxui/component/component.hpp"
 #include <vector>
-#include <iostream>
+
+#include "ftxui/component/screen_interactive.hpp"
+std::vector<std::string> returnCalendarMonth(int count);
 
 namespace DateInformation {
-
-    struct DateCalculation
-    {
+    struct DateCalculation {
         int prevMonth{-1};
         int prevYear{};
         int leapYear{};
     };
 
-    struct DayMonthYear
-    {
+    struct DaysPerMonth {
+        const std::vector<std::string> thirtyOne{};
+        const std::vector<std::string> thirty {};
+        const std::vector<std::string> twentyNine{};
+        const std::vector<std::string> twentyEight{};
+
+        DaysPerMonth() : thirtyOne(returnCalendarMonth(31)),thirty(returnCalendarMonth(30)),
+                         twentyNine(returnCalendarMonth(29)),twentyEight(returnCalendarMonth(28))
+        {
+        }
+    };
+
+    struct MonthNames {
+        std::vector<std::string> full{};
+        std::vector<std::string> taskStart{};
+        std::vector<std::string> taskEnd{};
+        std::vector<std::string> inner{};
+    };
+
+    struct DayMonthYear {
         int day{};
         int month{};
         int year{};
     };
 
+    struct Indices {
+        int startDay{};
+        int startMonth{};
+        int currentDay{};
+        int currentMonth{};
+    };
+
+    struct YearChecks {
+        bool isLeap{};
+        bool areYearsEqual{};
+
+    };
+
+    //experimental payload deliverer
+    struct EndDateDropdownPayload {
+        ftxui::ScreenInteractive& screen;
+        ftxui::Component& layout;
+
+        YearChecks& yearCheck;
+        MonthNames& months;
+        DaysPerMonth& daysPerMonth;
+        Indices& index;
+        DayMonthYear& taskStart;
+
+        std::vector<std::string>& taskStartDays;
+        std::vector<std::string>& taskEndDays;
+        std::vector<std::string>& yearsPast;
+
+        std::vector<std::string>& checkedMonths;
+        std::vector<std::string>& checkedDays;
+    };
+
     enum DateType {
         due,
         past,
+        end,
     };
-
-    // inline std::vector<std::string> months{
-    //     "January", "February", "March", "April", "May", "June", "July",
-    //     "August", "September", "October", "November", "December"
-    // };
-    // inline std::vector<std::string> february{
-    //     "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13",
-    //     "14", "15", "16", "17", "18",
-    //     "19", "20", "21", "22", "23", "24", "25", "26", "27", "28"
-    // };
-    // inline std::vector<std::string> februaryLeap{
-    //     "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13",
-    //     "14", "15", "16", "17", "18",
-    //     "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29"
-    // };
-    // inline std::vector<std::string> standardAmountOfDays{
-    //     "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13",
-    //     "14", "15", "16", "17", "18",
-    //     "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30"
-    // };
-    // inline std::vector<std::string> bigAmountOfDays{
-    //     "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13",
-    //     "14", "15", "16", "17", "18",
-    //     "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30",
-    //     "31"};
 
 };
 
+std::vector<DateInformation::DayMonthYear> dateDropdown();
+
+ftxui::Component taskStartDate(DateInformation::DayMonthYear &dates,
+                               const std::vector<std::string> &years,
+                               const std::vector<std::string> &days,
+                               const std::vector<std::string> &months,
+                               DateInformation::DateType calendarType);
+
+std::vector<std::string> calculateYears(DateInformation::DateType dateType,
+                                        int = 0);
 
 
 
+std::vector<std::string> returnMonthNames();
 
-std::vector<DateInformation::DayMonthYear>  dateDropdown();
-ftxui::Component taskStartDate(DateInformation::DayMonthYear& dates,const std::vector<std::string>& years,const std::vector<std::string>& days,const std::vector<std::string>& months);
+bool isPastGreater(const DateInformation::DayMonthYear &past,
+                   const DateInformation::DayMonthYear &future);
 
-std::vector<std::string> calculateYears(DateInformation::DateType dateType);
-std::vector<std::string> returnCalendarMonth(int count);
-constexpr std::vector<std::string> returnMonthNames();
+ftxui::Component makeComponent(ftxui::Element &element);
 
+void changeDropdown(DateInformation::DateCalculation &action,
+                    DateInformation::DayMonthYear &date,
+                    std::vector<std::string> &days,
+                    const std::vector<std::string> &years,
+                    ftxui::Component &input);
+
+void combineDates(DateInformation::DayMonthYear &pastDate,
+                  DateInformation::DayMonthYear &futureDate,
+                  ftxui::ScreenInteractive &screen, ftxui::Element &exceedDate,
+                  ftxui::Component &combinedDates);
+
+DateInformation::DayMonthYear endDateDropdown(const std::string& startDate);
+
+void sameYearEndDateDropdown(DateInformation::EndDateDropdownPayload& payload);
+
+void differentYearEndDropdown(DateInformation::EndDateDropdownPayload& payload);
+
+void dateCheckConditions(const DateInformation::DayMonthYear &taskStart,
+                         int monthIndex,
+                         std::vector<std::string> &checkedDays,std::vector<std::string>& yearsPast,
+                         const DateInformation::DaysPerMonth& daysPerMonth);
+std::vector<int> leapYearBetweenDates(int start,int end);
+int daysNumberFirstMonth(int startMonth,bool isLeap);
+DateInformation::DayMonthYear returnStartDateInt(const std::string& startDate);
 
 
 #endif //UNTITLED_DATE_H

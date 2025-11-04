@@ -1,9 +1,4 @@
-#include <TaskManager.h>
 #include <ProgramLogic.h>
-#include <fstream>
-#include <ftxui/component/screen_interactive.hpp>
-#include <chrono>
-#include <Date.h>
 
 int main(const int argc,char* argv[])
 {

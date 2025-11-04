@@ -1,6 +1,6 @@
 #ifndef UNTITLED_CONSTANTS_H
 #define UNTITLED_CONSTANTS_H
-#include <iostream>
+#include <string>
 
 namespace Constants
 {
@@ -34,6 +34,17 @@ namespace Constants
   ╚██████╔╝██║        ██║   ██║╚██████╔╝██║ ╚████║███████║
    ╚═════╝ ╚═╝        ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
                                                         )"};
+
+    inline std::string& spaceAdder(std::string& ascii,int count)
+    {
+        for (int x{0}; x <= count;++x)
+        {
+            //ascii.append(" ");
+            ascii.insert(ascii.begin(),count,' ');
+        }
+
+        return ascii;
+    }
 
 }
 #endif //UNTITLED_CONSTANTS_H

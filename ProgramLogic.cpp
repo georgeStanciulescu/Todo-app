@@ -1,9 +1,9 @@
-#include <chrono>
 #include <ProgramLogic.h>
-#include <TaskManager.h>
 #include <ErrorHandling.h>
+#include <Interface.h>
+#include <iostream>
 
-#include "Interface.h"
+#include "Constants.h"
 
 ProgramResult programLogic(const int argc,char* argv[])
 {
@@ -13,6 +13,10 @@ ProgramResult programLogic(const int argc,char* argv[])
 
     TaskManager tasker{};
     ErrorHandling validator{tasker};
+
+    // std::string ascii {Constants::optionsASCII};
+    // Constants::spaceAdder(ascii,15);
+    // std::cout << ascii << '\n';
 
     if (!validator.programStartHandle(argc)){return failure;};
 
@@ -44,12 +48,16 @@ ProgramResult programLogic(const int argc,char* argv[])
             tasker.deleteTask(argv[2]) == TaskManager::all ? successMessage(deletion,true) :successMessage(deletion);
 
             break;
-        case end:
+        case end: {
             if (!validator.endErrorHandle(argc,argv)){return failure;}
 
-            tasker.endTask(argv[2],argv[3]);
+            int taskID{std::stoi(argv[2]) - 1};
+            std::string startDate{tasker.getStartDate(taskID)};
+
+            tasker.endTask(argv[2],argv[3],startDate);
             successMessage(end);
             break;
+        }
         case change:
             if (!validator.changeErrorHandle(argc,argv)){return failure;}
 

@@ -1,7 +1,6 @@
 #include <InterfaceComposition.h>
-
-#include "Calculations.h"
-#include "Constants.h"
+#include <Calculations.h>
+#include <Constants.h>
 
 namespace InterfaceComposition
 {
@@ -21,9 +20,11 @@ namespace InterfaceComposition
                     text("ID") | bold | italic,
                        text("Task") | bold | italic ,
                        text("Status") | bold | italic,
-                       text("Date started") | bold | italic,
+                       text("Start date") | bold | italic,
                        text("Due date") | bold | italic,
-                       text("Days left") | bold | italic
+                       text("Days left") | bold | italic,
+                       text("Done date") | bold | italic,
+                        text("Start-due date difference") | bold | italic
                 }};
 
         tableDataCalculations(tasks,tableContent);
@@ -32,7 +33,9 @@ namespace InterfaceComposition
 
         tableLookInfo(table);
 
-        return table.Render();
+        return table.Render(); // I believe this is for static drawings of the table
+        //return Renderer([&table]{return table.Render();});
+        //return table;
     }
 
     void tableDataCalculations(const std::vector<TaskManager::Task>& tasks,std::vector<ftxui::Elements>& tableContent)
@@ -57,13 +60,15 @@ namespace InterfaceComposition
 
         table.SelectAll().Border(LIGHT);
 
-        for (int x{0}; x < 5;++x) {
+        for (int x{0}; x < 7;++x) {
             table.SelectColumn(x).Border(LIGHT);
+            if (x != 1) table.SelectColumn(x).DecorateCells(center);
         }
 
         table.SelectRow(0).Border(LIGHT);
-        table.SelectColumn(5).DecorateCells(center);
-        table.SelectColumn(2).DecorateCells(center);
+        // table.SelectColumn(5).DecorateCells(center);
+        // table.SelectColumn(2).DecorateCells(center);
+        //table.SelectCell(0,3).Decorate();
     }
 
     //The gauges do not use dividingTasks() because there is no difference to their appearance if totalTasks is zero
@@ -82,7 +87,7 @@ namespace InterfaceComposition
         }
         const float totalTasks{successTasks + runningTasks + cancelledTasks};
 
-        auto hboxCreator = [&](const std::string& label,const float value,const Color& colour) {
+        auto hboxCreator = [&totalTasks](const std::string& label,const float value,const Color& colour) {
                 return hbox(
                     window(text(label) | bold | italic,
                         text(std::format("{}%",dividingTasks(value,totalTasks)* 100)) | bold),
@@ -102,13 +107,15 @@ namespace InterfaceComposition
         using namespace ftxui;
 
         values.push_back(text(std::format("{}",task.id)) | bold );
-        colour == Color::Default ? values.push_back(paragraph(task.description) | bold )
-                                    : values.push_back(paragraph(task.description) | bold | strikethrough);
+        colour == Color::Default ? values.push_back(paragraph(task.description) | bold | flex | size(WIDTH,LESS_THAN,50)) //| size(WIDTH,LESS_THAN,50))
+                                    : values.push_back(paragraph(task.description)  | dim | flex | size(WIDTH,LESS_THAN,50));//| size(WIDTH,LESS_THAN,50));
         values.push_back(text(std::format("{}",task.completion)) | bold | color(colour));
         values.push_back(text(task.date) | bold);
         values.push_back(text(task.dueDate) | bold);
         colour == Color::Default ? values.push_back(text(task.daysLeft) | bold)
                                     : values.push_back(text(task.daysLeft) | bold | strikethrough | color(colour));
+        values.push_back(text(task.endDate) | bold);
+        values.push_back(text(task.startDateEndDateDifference) | bold);
     }
 }
 

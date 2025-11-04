@@ -2,7 +2,7 @@
 #define UNTITLED_TASKMANAGER_H
 
 #include <vector>
-#include <iostream>
+#include <string>
 
 class TaskManager {
 public:
@@ -29,6 +29,8 @@ public:
         std::string date;
         std::string dueDate;
         std::string daysLeft;
+        std::string endDate;
+        std::string startDateEndDateDifference;
     };
 private:
     std::vector<Task> tasks{};
@@ -37,11 +39,13 @@ public:
 
     [[nodiscard]] const std::vector<Task>& getTasks() const {return tasks;}
     DeletionType deleteTask(const char* taskID);
-    void endTask(const char* taskID,const char* status);
+    void endTask(const char* taskID,const char* status,const std::string& startDate);
     void addTask(char* argv[],int argc);
     void changeTask(const char* taskID);
     void listTasks();
     bool duplicateCheck(const char* duplicateArg);
+    std::string getStartDate(const int id) const {return tasks[id].date;}
+    std::string getEndDate(const int id) const {return tasks[id].endDate;}
 
 };
 #endif //UNTITLED_TASKMANAGER_H
