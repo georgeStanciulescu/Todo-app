@@ -117,5 +117,6 @@ namespace InterfaceComposition
         values.push_back(text(task.endDate) | bold);
         values.push_back(text(task.startDateEndDateDifference) | bold);
     }
+
 }
 

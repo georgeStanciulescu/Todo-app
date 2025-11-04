@@ -42,7 +42,9 @@ add_executable(task task.cpp
         InterfaceComposition.h
         InterfaceComposition.cpp
         Date.h
-        Date.cpp)
+        Date.cpp
+        DateCreation.h
+        DateCreation.cpp)
 
 set(CMAKE_BUILD_TYPE Debug)
 

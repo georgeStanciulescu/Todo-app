@@ -4,6 +4,7 @@
 #include <format>
 
 #include "TaskManager.h"
+#include "ftxui/component/component_base.hpp"
 #include "ftxui/dom/elements.hpp"
 #include "ftxui/dom/table.hpp"
 

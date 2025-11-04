@@ -80,49 +80,21 @@ namespace DateInformation {
 };
 
 std::vector<DateInformation::DayMonthYear> dateDropdown();
-
-ftxui::Component taskStartDate(DateInformation::DayMonthYear &dates,
-                               const std::vector<std::string> &years,
-                               const std::vector<std::string> &days,
-                               const std::vector<std::string> &months,
-                               DateInformation::DateType calendarType);
-
-std::vector<std::string> calculateYears(DateInformation::DateType dateType,
-                                        int = 0);
-
-
-
-std::vector<std::string> returnMonthNames();
-
-bool isPastGreater(const DateInformation::DayMonthYear &past,
-                   const DateInformation::DayMonthYear &future);
-
-ftxui::Component makeComponent(ftxui::Element &element);
-
-void changeDropdown(DateInformation::DateCalculation &action,
-                    DateInformation::DayMonthYear &date,
-                    std::vector<std::string> &days,
-                    const std::vector<std::string> &years,
+void changeDropdown(DateInformation::DateCalculation &action,const DateInformation::DayMonthYear &date,
+                    std::vector<std::string> &days,const std::vector<std::string> &years,
                     ftxui::Component &input);
-
-void combineDates(DateInformation::DayMonthYear &pastDate,
-                  DateInformation::DayMonthYear &futureDate,
+void combineDates(DateInformation::DayMonthYear &pastDate,DateInformation::DayMonthYear &futureDate,
                   ftxui::ScreenInteractive &screen, ftxui::Element &exceedDate,
                   ftxui::Component &combinedDates);
 
+
 DateInformation::DayMonthYear endDateDropdown(const std::string& startDate);
-
 void sameYearEndDateDropdown(DateInformation::EndDateDropdownPayload& payload);
-
 void differentYearEndDropdown(DateInformation::EndDateDropdownPayload& payload);
-
-void dateCheckConditions(const DateInformation::DayMonthYear &taskStart,
-                         int monthIndex,
-                         std::vector<std::string> &checkedDays,std::vector<std::string>& yearsPast,
+void dateCheckConditions(const DateInformation::DayMonthYear &taskStart,int monthIndex,
+                         std::vector<std::string> &checkedDays,const std::vector<std::string>& yearsPast,
                          const DateInformation::DaysPerMonth& daysPerMonth);
-std::vector<int> leapYearBetweenDates(int start,int end);
-int daysNumberFirstMonth(int startMonth,bool isLeap);
-DateInformation::DayMonthYear returnStartDateInt(const std::string& startDate);
+
 
 
 #endif //UNTITLED_DATE_H

@@ -45,7 +45,6 @@ namespace IO {
                             myTask.substr(closeBraceLast + 1,openBracketLast - closeBraceLast - 1),
                             myTask.substr(openBracketLast + 1));
         }
-        myFile.close();
     }
 
     void deleteTaskIO(std::vector<TaskManager::Task> &tasks,
@@ -80,8 +79,8 @@ namespace IO {
 
         DateInformation::DayMonthYear taskEndDate{endDateDropdown(startDateString)};
 
-        std::size_t dayEnd{startDateString.find_first_of("/")};
-        std::size_t monthEnd{startDateString.find_last_of("/")};
+        std::size_t dayEnd{startDateString.find_first_of('/')};
+        std::size_t monthEnd{startDateString.find_last_of('/')};
 
         std::string day {startDateString.substr(0,dayEnd)};
         std::string month {startDateString.substr(dayEnd + 1,monthEnd - dayEnd - 1)};
