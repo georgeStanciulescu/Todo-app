@@ -29,8 +29,6 @@ inline int presentToDueDate(const DateInformation::DayMonthYear& endDate)
 
     const auto dayDifference = dueDate - presentDate;
 
-    //std::cout << "FROM THE CALCULATE DATE FUNCTION DIRECTLY,THE DIFFERENCE IS: " << dayDifference << '\n';
-
     return static_cast<int>(dayDifference.count());
 
 }

@@ -1,7 +1,5 @@
 #include <Date.h>
-#include <future>
 
-#include "Constants.h"
 #include "ftxui/component/screen_interactive.hpp"
 #include <iostream>
 #include <InterfaceComposition.h>
@@ -13,8 +11,8 @@
 std::vector<DateInformation::DayMonthYear> dateDropdown() {
     using namespace DateInformation;
 
-    const auto yearsPast{calculateYears(past)};
-    const auto yearsFuture{calculateYears(due)};
+    const auto yearsPast{calculateYears(DateType::past)};
+    const auto yearsFuture{calculateYears(DateType::due)};
 
     auto daysPast{returnCalendarMonth(31)};
     auto daysFuture{returnCalendarMonth(31)};
@@ -27,8 +25,8 @@ std::vector<DateInformation::DayMonthYear> dateDropdown() {
     ftxui::Element exceedDate{ftxui::text("")};
     auto infoWindow = createInfoWindow();
 
-    auto layout = taskStartDate(pastDate, yearsPast, daysPast, months, past);
-    auto dueDate = taskStartDate(futureDate, yearsFuture, daysFuture, months,due);
+    auto layout = taskStartDate(pastDate, yearsPast, daysPast, months, DateType::past);
+    auto dueDate = taskStartDate(futureDate, yearsFuture, daysFuture, months, DateType::due);
 
     const auto info = makeComponent(infoWindow);
 
@@ -104,9 +102,7 @@ void combineDates(DateInformation::DayMonthYear &pastDate,DateInformation::DayMo
                 screen.Exit();
                 return true; // Consume the event and exit
             }
-            isPastGreater(pastDate, futureDate)
-                ? exceedDate = ftxui::text("\n\nThe due date is earlier than the start date!")
-                         | ftxui::bold | ftxui::color(ftxui::Color::IndianRedBis)
+            isPastGreater(pastDate,futureDate) ? exceedDate = ftxui::text("\n\nThe due date is earlier than the start date!")| ftxui::bold | ftxui::color(ftxui::Color::IndianRedBis)
                 : exceedDate = ftxui::text("");
 
             return false;
@@ -121,7 +117,7 @@ DateInformation::DayMonthYear endDateDropdown(const std::string &startDate)
 
     const auto [day, month, year]{returnStartDateInt(startDate)};
 
-    auto yearsPast{calculateYears(end, year)};
+    auto yearsPast{calculateYears(DateType::end, year)};
     const auto fullMonths{returnMonthNames()};
 
     Indices index{day - 1, month - 1,
@@ -150,7 +146,7 @@ DateInformation::DayMonthYear endDateDropdown(const std::string &startDate)
     auto infoWindow = createInfoWindow();
     const auto info = makeComponent(infoWindow);
 
-    auto layout = taskStartDate(taskStart, yearsPast, checkedDays,checkedMonths, end);
+    auto layout = taskStartDate(taskStart, yearsPast, checkedDays,checkedMonths, DateType::end);
     auto finalLayout = createDateDropdown(layout);
 
     std::cout << "\033[2J\033[H" << std::flush; // used to flush the screen

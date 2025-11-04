@@ -17,7 +17,7 @@ namespace Interface
     bool userWantsDuplicate(bool isDuplicate);
     void displayTotalList(const std::vector<TaskManager::Task>& tasks);
     bool errorResponse(TaskManager::DetailType type);
-    void exceptionErrorMessage(ErrorHandling::ErrorType type);
+    void exceptionErrorMessage(ErrorHandling::ErrorType type,int line);
 }
 
 

@@ -4,11 +4,17 @@
 
 namespace Constants
 {
-    inline constexpr std::string fileName{"tasks.txt"};
+    inline constexpr std::string_view fileName{"tasks.txt"};
 
     inline constexpr char successMark{'s'};
     inline constexpr char failureMark{'x'};
     inline constexpr char ongoingMark{'-'};
+
+    inline constexpr char openBrace{'{'};
+    inline constexpr char closedBrace{'}'};
+    inline constexpr char openBracket{'['};
+    inline constexpr char closedBracket{']'};
+
     inline constexpr int minEndArgs{4};
     inline constexpr int minStartArgs{2};
     inline constexpr int minGeneralArgs{3};
@@ -18,7 +24,7 @@ namespace Constants
     inline constexpr int thirdArg{2};
     inline constexpr int fourthArg{3};
 
-    inline std::string listASCII{R"(
+    constexpr std::string_view listASCII{R"(
   ██╗     ██╗███████╗████████╗
   ██║     ██║██╔════╝╚══██╔══╝
   ██║     ██║███████╗   ██║
@@ -26,7 +32,7 @@ namespace Constants
   ███████╗██║███████║   ██║
   ╚══════╝╚═╝╚══════╝   ╚═╝   )"};
 
-    inline std::string optionsASCII{ R"(
+    constexpr std::string_view optionsASCII{ R"(
    ██████╗ ██████╗ ████████╗██╗ ██████╗ ███╗   ██╗███████╗
   ██╔═══██╗██╔══██╗╚══██╔══╝██║██╔═══██╗████╗  ██║██╔════╝
   ██║   ██║██████╔╝   ██║   ██║██║   ██║██╔██╗ ██║███████╗

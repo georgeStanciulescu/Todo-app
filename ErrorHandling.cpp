@@ -53,14 +53,14 @@ bool ErrorHandling::boundaryCheck(const char* boundaryArg) const
         const int taskID{std::stoi(boundaryArg)};
         if (taskID < 1 || static_cast<std::size_t>(taskID) > taskManager.getTasks().size())
         {
-            Interface::exceptionErrorMessage(outOfRange);
+            Interface::exceptionErrorMessage(outOfRange,0);
             return false;
         }
     } catch (const std::invalid_argument&) {
-        Interface::exceptionErrorMessage(outOfRange);
+        Interface::exceptionErrorMessage(outOfRange,0);
          return false;
     } catch (const std::out_of_range&) {
-        Interface::exceptionErrorMessage(outOfRange);
+        Interface::exceptionErrorMessage(outOfRange,0);
         return false;
     }
 

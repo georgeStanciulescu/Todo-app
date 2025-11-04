@@ -16,7 +16,7 @@ namespace Interface {
             case basic: {
                 displayText(ftxui::vbox(
                     text(""),
-                    paragraph(Constants::optionsASCII) | bold,
+                    paragraph(static_cast<std::string>(Constants::optionsASCII)) | bold,
                     text(""),
                     text("[list] -- Presents the list of tasks") | bold,
                     text("[add] -- Add a task") | bold,
@@ -92,14 +92,42 @@ namespace Interface {
         }
     }
 
-    void exceptionErrorMessage(const ErrorHandling::ErrorType type) {
+    void exceptionErrorMessage(const ErrorHandling::ErrorType type,int line) {
         using enum ErrorHandling::ErrorType;
         using namespace InterfaceComposition;
 
+        if (line > 0){displayText(makeVbox("List of issues:"));}
+
         switch (type) {
             case outOfRange:
-                displayText(makeVbox(
-                    "The task ID cannot be found! Introduce an ID for a task in the list!"));
+                displayText(makeVbox("The task ID cannot be found! Introduce an ID for a task in the list!"));
+                break;
+            case id:
+                displayText(makeVbox(std::format("Line {}:missing or invalid id",line)));
+                break;
+            case description:
+                displayText(makeVbox(std::format("Line {}:malformed description",line)));
+                break;
+            case status:
+                displayText(makeVbox(std::format("Line {}:missing status",line)));
+                break;
+            case startDate:
+                displayText(makeVbox(std::format("Line {}:malformed start date",line)));
+                break;
+            case dueDate:
+                displayText(makeVbox(std::format("Line {}:malformed due date",line)));
+                break;
+            case daysLeft:
+                displayText(makeVbox(std::format("Line {}:malformed present-to-due date calculation",line)));
+                break;
+            case endDate:
+                displayText(makeVbox(std::format("Line {}:malformed end date calculation",line)));
+                break;
+            case startDateEndDateDifference:
+                displayText(makeVbox(std::format("Line {}:malformed start-to-end-date calculation",line)));
+                break;
+            case dueDateEndDateDifference:
+                displayText(makeVbox(std::format("Line {}:malformed due-to-end-date calculation",line)));
                 break;
         }
     }
@@ -173,7 +201,7 @@ namespace Interface {
 
          displayText(vbox(
              text(""),
-             paragraph(Constants::listASCII) | bold | italic,
+             paragraph(static_cast<std::string>(Constants::listASCII)) | bold | italic,
              text(""),
              table,
              progressBar | size(HEIGHT,EQUAL,10)

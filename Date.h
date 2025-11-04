@@ -4,8 +4,9 @@
 #include "ftxui/component/component.hpp"
 #include <vector>
 
+#include "DateCreation.h"
 #include "ftxui/component/screen_interactive.hpp"
-std::vector<std::string> returnCalendarMonth(int count);
+
 
 namespace DateInformation {
     struct DateCalculation {
@@ -71,7 +72,7 @@ namespace DateInformation {
         std::vector<std::string>& checkedDays;
     };
 
-    enum DateType {
+    enum class DateType {
         due,
         past,
         end,

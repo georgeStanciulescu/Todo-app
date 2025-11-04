@@ -20,9 +20,9 @@ TaskManager::DeletionType TaskManager::deleteTask(const char* taskID)
     return single;
 }
 
-void TaskManager::endTask(const char* taskID,const char* status,const std::string& startDate)
+void TaskManager::endTask(const char* taskID,const char* status,const std::string& startDate,const std::string& dueDate)
 {
-    IO::endTaskIO(tasks,taskID,status,startDate);
+    IO::endTaskIO(tasks,taskID,status,startDate,dueDate);
 }
 
 void TaskManager::addTask(char* argv[],int argc)

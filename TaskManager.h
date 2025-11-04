@@ -31,6 +31,7 @@ public:
         std::string daysLeft;
         std::string endDate;
         std::string startDateEndDateDifference;
+        std::string dueDateEndDateDifference;
     };
 private:
     std::vector<Task> tasks{};
@@ -38,14 +39,17 @@ public:
     TaskManager();
 
     [[nodiscard]] const std::vector<Task>& getTasks() const {return tasks;}
+    [[nodiscard]]std::string getStartDate(const int id) const {return tasks[id].date;}
+    [[nodiscard]]std::string getEndDate(const int id) const {return tasks[id].endDate;}
+    [[nodiscard]]std::string getDueDate(const int id) const {return tasks[id].dueDate;}
+
     DeletionType deleteTask(const char* taskID);
-    void endTask(const char* taskID,const char* status,const std::string& startDate);
+    void endTask(const char* taskID,const char* status,const std::string& startDate,const std::string& dueDate);
     void addTask(char* argv[],int argc);
     void changeTask(const char* taskID);
     void listTasks();
     bool duplicateCheck(const char* duplicateArg);
-    std::string getStartDate(const int id) const {return tasks[id].date;}
-    std::string getEndDate(const int id) const {return tasks[id].endDate;}
+
 
 };
 #endif //UNTITLED_TASKMANAGER_H

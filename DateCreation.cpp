@@ -1,8 +1,7 @@
-
 #include "DateCreation.h"
 
 #include <Date.h>
-#include "ftxui/component/loop.hpp"
+#include "ftxui/component/component.hpp"
 
 ftxui::Component taskStartDate(DateInformation::DayMonthYear &dates,const std::vector<std::string> &years,
                                const std::vector<std::string> &days,const std::vector<std::string> &months,
@@ -71,24 +70,25 @@ ftxui::Element createInfoWindow()
 
 std::vector<std::string> calculateYears(const DateInformation::DateType dateType,const int start)
 {
+    using namespace DateInformation;
     const auto presentYear = returnPresentDate().year();
 
     std::vector<std::string> years{};
 
     switch (dateType) {
-        case DateInformation::past:
+        case DateType::past:
             for (int x{presentYear}; x > (static_cast<int>(presentYear) - 5); --x)
             {
                 years.emplace_back(std::to_string(x));
             }
             break;
-        case DateInformation::due:
+        case DateType::due:
             for (int x{presentYear}; x < (static_cast<int>(presentYear) + 5); ++x)
             {
                 years.emplace_back(std::to_string(x));
             }
             break;
-        case DateInformation::end:
+        case DateType::end:
             for (int x{start}; x <= (static_cast<int>(presentYear)); ++x)
             {
                 years.emplace_back(std::to_string(x));
@@ -129,8 +129,8 @@ std::vector<int> leapYearBetweenDates(const int start, const int end)
 
 //Kinda hacky,if one's purpose were to use this function outside of the FTXUI-bound,indexed approach
 // past.year and future.year are both indices into yearsPast and yearsFuture;thus if they both equal zero,they're the same year
-bool isPastGreater(const DateInformation::DayMonthYear &past,
-                   const DateInformation::DayMonthYear &future)
+bool isPastGreater(DateInformation::DayMonthYear &past,
+                   DateInformation::DayMonthYear &future)
 {
     if (past.year == 0 && future.year == 0)
     {

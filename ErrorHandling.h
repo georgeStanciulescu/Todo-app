@@ -7,6 +7,15 @@ class ErrorHandling
 public:
     enum ErrorType
     {
+        id,
+        description,
+        status,
+        startDate,
+        dueDate,
+        daysLeft,
+        endDate,
+        startDateEndDateDifference,
+        dueDateEndDateDifference,
         outOfRange,
     };
 private:

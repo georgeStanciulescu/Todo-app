@@ -1,7 +1,7 @@
 #include <ProgramLogic.h>
 #include <ErrorHandling.h>
 #include <Interface.h>
-#include <iostream>
+
 
 #include "Constants.h"
 
@@ -13,10 +13,6 @@ ProgramResult programLogic(const int argc,char* argv[])
 
     TaskManager tasker{};
     ErrorHandling validator{tasker};
-
-    // std::string ascii {Constants::optionsASCII};
-    // Constants::spaceAdder(ascii,15);
-    // std::cout << ascii << '\n';
 
     if (!validator.programStartHandle(argc)){return failure;};
 
@@ -51,10 +47,11 @@ ProgramResult programLogic(const int argc,char* argv[])
         case end: {
             if (!validator.endErrorHandle(argc,argv)){return failure;}
 
-            int taskID{std::stoi(argv[2]) - 1};
-            std::string startDate{tasker.getStartDate(taskID)};
+            const int taskID{std::stoi(argv[2]) - 1};
+            const std::string startDate{tasker.getStartDate(taskID)};
+            const std::string dueDate{tasker.getDueDate(taskID)};
 
-            tasker.endTask(argv[2],argv[3],startDate);
+            tasker.endTask(argv[2],argv[3],startDate,dueDate);
             successMessage(end);
             break;
         }

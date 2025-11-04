@@ -24,7 +24,8 @@ namespace InterfaceComposition
                        text("Due date") | bold | italic,
                        text("Days left") | bold | italic,
                        text("Done date") | bold | italic,
-                        text("Start-due date difference") | bold | italic
+                        text("S-E date diff") | bold | italic,
+                        text("D-E date diff") | bold | italic
                 }};
 
         tableDataCalculations(tasks,tableContent);
@@ -33,9 +34,7 @@ namespace InterfaceComposition
 
         tableLookInfo(table);
 
-        return table.Render(); // I believe this is for static drawings of the table
-        //return Renderer([&table]{return table.Render();});
-        //return table;
+        return table.Render();
     }
 
     void tableDataCalculations(const std::vector<TaskManager::Task>& tasks,std::vector<ftxui::Elements>& tableContent)
@@ -60,15 +59,11 @@ namespace InterfaceComposition
 
         table.SelectAll().Border(LIGHT);
 
-        for (int x{0}; x < 7;++x) {
+        for (int x{0}; x < 8;++x) {
             table.SelectColumn(x).Border(LIGHT);
             if (x != 1) table.SelectColumn(x).DecorateCells(center);
         }
-
         table.SelectRow(0).Border(LIGHT);
-        // table.SelectColumn(5).DecorateCells(center);
-        // table.SelectColumn(2).DecorateCells(center);
-        //table.SelectCell(0,3).Decorate();
     }
 
     //The gauges do not use dividingTasks() because there is no difference to their appearance if totalTasks is zero
@@ -116,6 +111,7 @@ namespace InterfaceComposition
                                     : values.push_back(text(task.daysLeft) | bold | strikethrough | color(colour));
         values.push_back(text(task.endDate) | bold);
         values.push_back(text(task.startDateEndDateDifference) | bold);
+        values.push_back(text(task.dueDateEndDateDifference) | bold);
     }
 
 }
