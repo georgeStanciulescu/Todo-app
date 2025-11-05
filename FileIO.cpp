@@ -97,9 +97,9 @@ namespace IO
 
         tasks.erase(tasks.begin() + chosenTask);
 
-        for (std::size_t x{1}; x < tasks.size(); ++x)
+        for (std::size_t x{0}; x < tasks.size(); ++x)
         {
-             tempFile  << x << openBrace << tasks[x].description << closedBrace
+             tempFile  << x + 1 << openBrace << tasks[x].description << closedBrace
                        << tasks[x].completion << openBracket << tasks[x].date << closedBracket
                        << tasks[x].dueDate << openBrace << tasks[x].daysLeft << closedBrace
                        << tasks[x].endDate << openBracket <<tasks[x].startDateEndDateDifference

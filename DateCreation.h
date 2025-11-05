@@ -27,12 +27,11 @@ std::vector<int> leapYearBetweenDates(int start,int end);
 
 
 bool isPastGreater(DateInformation::DayMonthYear &past,DateInformation::DayMonthYear &future);
-int daysNumberFirstMonth(int startMonth,bool isLeap);
+int daysNumberFirstMonth(int startMonth, int year);
 std::chrono::year_month_day returnPresentDate();
 
 DateInformation::DayMonthYear returnStartDateInt(const std::string& startDate);
-DateInformation::DayMonthYear returnEndDateInt(const std::vector<std::string>& fullMonths,const std::string& day,
-                                               const std::string& month,const std::string& year);
+DateInformation::DayMonthYear convertIndices(const DateInformation::DayMonthYear& date,const std::vector<std::string>& years);
 
 
 #endif //UNTITLED_DATECREATION_H

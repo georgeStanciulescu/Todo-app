@@ -51,14 +51,8 @@ std::vector<DateInformation::DayMonthYear> dateDropdown() {
 
     screen.Loop(total);
 
-    pastDate.year = std::stoi(yearsPast[pastDate.year]);
-    futureDate.year = std::stoi(yearsFuture[futureDate.year]);
-    pastDate.day += 1;
-    pastDate.month += 1;
-    futureDate.month += 1;
-    futureDate.day += 1;
-
-    return {pastDate, futureDate};
+    return { convertIndices(pastDate,yearsPast),
+                convertIndices(futureDate,yearsFuture)};
 }
 
 void changeDropdown(DateInformation::DateCalculation &action,const DateInformation::DayMonthYear &date,
@@ -73,20 +67,7 @@ void changeDropdown(DateInformation::DateCalculation &action,const DateInformati
             action.prevMonth = date.month;
             action.prevYear = date.year;
 
-            if (date.month == 3 || date.month == 5 || date.month == 8 || date.month == 10)
-            {
-                days = staticDays.thirty;
-            }
-            else if (date.month == 1){
-                action.leapYear = std::stoi(years[date.year]);
-
-                if (static_cast<std::chrono::year>(action.leapYear).is_leap())
-                {
-                    days = staticDays.twentyNine;
-                }
-                else { days = staticDays.twentyEight; }
-            }
-            else{ days = staticDays.thirtyOne;}
+            dateCheckConditions(date.year,date.month+1,days,years,staticDays);
         }
         return false; // Let other events pass through
     });
@@ -125,17 +106,15 @@ DateInformation::DayMonthYear endDateDropdown(const std::string &startDate)
       static_cast<int>(static_cast<unsigned int>(ymd.month()))};
     MonthNames months{            fullMonths,
         std::vector(fullMonths.begin() + index.startMonth, fullMonths.end()),
-          std::vector(fullMonths.begin(),fullMonths.begin() + index.currentMonth),
-            std::vector(fullMonths.begin() + index.startMonth,fullMonths.begin() + index.currentMonth)};
-    DayMonthYear taskStart{index.currentDay, index.currentMonth, static_cast<int>(yearsPast.size())};
+          std::vector(fullMonths.begin(),fullMonths.begin() + index.currentMonth)};
+    DayMonthYear taskStart{index.currentDay - 1, index.currentMonth, static_cast<int>(yearsPast.size() - 1)};
     DaysPerMonth daysPerMonth{};
-    YearChecks yearCheck{std::chrono::year(year).is_leap(), std::chrono::year(year) == ymd.year()};
 
-    int daysInMonth{daysNumberFirstMonth(index.startMonth, yearCheck.isLeap)};
+    int daysInMonth{daysNumberFirstMonth(index.startMonth, year)};
 
     // the days in the month remaining for the start date and the days in the month up to the date for the end date
     auto taskStartDays = std::vector(daysPerMonth.thirtyOne.begin() + index.startDay,
-                                     daysPerMonth.thirtyOne.begin() + daysInMonth); //
+                                     daysPerMonth.thirtyOne.begin() + daysInMonth);
     auto taskEndDays = std::vector(  daysPerMonth.thirtyOne.begin(),
                                      daysPerMonth.thirtyOne.begin() + index.currentDay);
 
@@ -154,92 +133,67 @@ DateInformation::DayMonthYear endDateDropdown(const std::string &startDate)
     auto screen = ftxui::ScreenInteractive::FitComponent();
 
     EndDateDropdownPayload payload{
-        screen, finalLayout, yearCheck, months, daysPerMonth, index, taskStart,
+        screen, finalLayout, months, daysPerMonth, index, taskStart,
         taskStartDays, taskEndDays, yearsPast, checkedMonths, checkedDays
     };
 
-    yearCheck.areYearsEqual ? sameYearEndDateDropdown(payload) : differentYearEndDropdown(payload);
+    endDateDropdownUpdate(payload);
 
     auto total = ftxui::Container::Vertical({info,finalLayout});
 
     screen.Loop(total);
 
-    return { returnEndDateInt(fullMonths,checkedDays[taskStart.day],
-    checkedMonths[taskStart.month],yearsPast[taskStart.year])};
+    return{ std::stoi(checkedDays[taskStart.day]),
+        monthMap.at(checkedMonths[taskStart.month]),
+        std::stoi(yearsPast[taskStart.year])};
 }
 
-void sameYearEndDateDropdown(DateInformation::EndDateDropdownPayload &payload)
+void endDateDropdownUpdate(DateInformation::EndDateDropdownPayload &payload)
 {
-    payload.layout |= ftxui::CatchEvent([&](const ftxui::Event &event) {
-        if (event == ftxui::Event::Escape) {
-            payload.screen.Exit();
-            return true;
-        }
-        if (payload.yearCheck.areYearsEqual) {
-            payload.checkedMonths = payload.months.inner;
-            payload.index.currentMonth = payload.months.inner.size() - 1;
-            if (payload.taskStart.month == 0) {
-                payload.checkedDays = payload.taskStartDays;
-            } else if (payload.taskStart.month == payload.index.currentMonth) {
-                payload.checkedDays = payload.taskEndDays;
-            } else {
-                dateCheckConditions(payload.taskStart, payload.index.startMonth,
-                                    payload.checkedDays, payload.yearsPast,
-                                    payload.daysPerMonth);
+    payload.layout |= ftxui::CatchEvent([&](const ftxui::Event &event)
+        {
+            if (event == ftxui::Event::Escape) {
+                payload.screen.Exit();
+                return true;
             }
-        }
 
-        return false;
+            int realMonthIndex{};
+            if (payload.taskStart.year == 0) {
+                payload.checkedMonths = payload.months.taskStart;
+                realMonthIndex = payload.taskStart.month + payload.index.startMonth + 1;
+            }
+            else if (payload.taskStart.year == payload.yearsPast.size() - 1) {
+                payload.checkedMonths = payload.months.taskEnd;
+                realMonthIndex = payload.taskStart.month + 1;
+            }
+            else {
+                payload.checkedMonths = payload.months.full;
+                realMonthIndex = payload.taskStart.month + 1;
+            }
+
+            if (payload.taskStart.year == 0 && payload.taskStart.month == 0){payload.checkedDays = payload.taskStartDays;}
+            else if ((payload.taskStart.year == payload.yearsPast.size() - 1) && (payload.taskStart.month == payload.checkedMonths.size() - 1 ))
+            {
+                payload.checkedDays = payload.taskEndDays;
+            }
+            else{dateCheckConditions(payload.taskStart.year,realMonthIndex,payload.checkedDays,payload.yearsPast,payload.daysPerMonth);}
+
+            return false;
     });
+
 }
 
-void differentYearEndDropdown(DateInformation::EndDateDropdownPayload &payload)
-{
-    payload.layout |= ftxui::CatchEvent([&](const ftxui::Event &event) {
-        if (event == ftxui::Event::Escape) {
-            payload.screen.Exit();
-            return true;
-        }
-        if (payload.taskStart.year == 0) {
-            payload.checkedMonths = payload.months.taskStart;
-            if (payload.taskStart.month == 0) {
-                payload.checkedDays = payload.taskStartDays;
-            } else {
-                dateCheckConditions(payload.taskStart, payload.index.startMonth,
-                                    payload.checkedDays, payload.yearsPast,
-                                    payload.daysPerMonth);
-            }
-        } else if (payload.taskStart.year == payload.yearsPast.size() - 1) {
-            payload.checkedMonths = payload.months.taskEnd;
-            payload.index.currentMonth = payload.months.taskEnd.size() - 1;
-            if (payload.taskStart.month == payload.index.currentMonth) {
-                payload.checkedDays = payload.taskEndDays;
-            } else {
-                dateCheckConditions(payload.taskStart, 0, payload.checkedDays,
-                                    payload.yearsPast, payload.daysPerMonth);
-            }
-        } else {
-            payload.checkedMonths = payload.months.full;
-            dateCheckConditions(payload.taskStart, 0, payload.checkedDays,
-                                payload.yearsPast, payload.daysPerMonth);
-        }
-
-        return false;
-    });
-}
-
-void dateCheckConditions(const DateInformation::DayMonthYear &taskStart,const int monthIndex,
+void dateCheckConditions(const int yearIndex,const int realMonth,
                          std::vector<std::string> &checkedDays,const std::vector<std::string> &yearsPast,
                          const DateInformation::DaysPerMonth &daysPerMonth)
 {
-    const auto leapYear = static_cast<std::chrono::year>(std::stoi(yearsPast[taskStart.year]));
+    const auto leapYear = static_cast<std::chrono::year>(std::stoi(yearsPast[yearIndex]));
 
-    if (taskStart.month == 3 - monthIndex || taskStart.month == 5 - monthIndex
-        || taskStart.month == 8 - monthIndex || taskStart.month == 10 -monthIndex)
+    if (realMonth == 4 || realMonth == 6 || realMonth == 9 || realMonth == 11)
     {
         checkedDays = daysPerMonth.thirty;
     }
-    else if (taskStart.month == 1 - monthIndex)
+    else if (realMonth == 2)
         {
         if (leapYear.is_leap()) { checkedDays = daysPerMonth.twentyNine; }
         else {checkedDays = daysPerMonth.twentyEight;}

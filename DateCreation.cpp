@@ -140,14 +140,14 @@ bool isPastGreater(DateInformation::DayMonthYear &past,
     return false;
 }
 
-int daysNumberFirstMonth(const int startMonth, const bool isLeap)
+int daysNumberFirstMonth(const int startMonth, const int year)
 {
     if (startMonth == 3 || startMonth == 5 ||
         startMonth == 8 || startMonth ==10){ return 30; }
 
     if (startMonth == 1)
     {
-        if (isLeap) { return 29; }
+        if (static_cast<std::chrono::year>(year).is_leap()) { return 29; }
         return 28;
     }
     return 31;
@@ -170,18 +170,9 @@ DateInformation::DayMonthYear returnStartDateInt(const std::string &startDate)
     return {std::stoi(day), std::stoi(month), std::stoi(year)};
 }
 
-DateInformation::DayMonthYear returnEndDateInt(const std::vector<std::string>& fullMonths,const std::string& day,const std::string& month,const std::string& year)
+DateInformation::DayMonthYear convertIndices(const DateInformation::DayMonthYear& date,
+                                             const std::vector<std::string>& years)
 {
-    int actualMonth{1};
-    for (int x{0}; x <= fullMonths.size(); ++x)
-    {
-        if (fullMonths[x] == month)
-        {
-            actualMonth += x;
-            break;
-        }
-    }
-
-    return{std::stoi(day),actualMonth,std::stoi(year)};
+    return {    date.day + 1,date.month + 1,std::stoi(years[date.year])};
 }
 

@@ -31,7 +31,6 @@ namespace DateInformation {
         std::vector<std::string> full{};
         std::vector<std::string> taskStart{};
         std::vector<std::string> taskEnd{};
-        std::vector<std::string> inner{};
     };
 
     struct DayMonthYear {
@@ -47,18 +46,11 @@ namespace DateInformation {
         int currentMonth{};
     };
 
-    struct YearChecks {
-        bool isLeap{};
-        bool areYearsEqual{};
-
-    };
-
     //experimental payload deliverer
     struct EndDateDropdownPayload {
         ftxui::ScreenInteractive& screen;
         ftxui::Component& layout;
 
-        YearChecks& yearCheck;
         MonthNames& months;
         DaysPerMonth& daysPerMonth;
         Indices& index;
@@ -78,6 +70,12 @@ namespace DateInformation {
         end,
     };
 
+    inline std::unordered_map<std::string,int> monthMap{
+        {"January",1},{"February",2},{"March",3},{"April",4},{"May",5},
+        {"June",6},{"July",7},{"August",8},{"September",9},{"October",10},
+        {"November",11},{"December",12}
+    };
+
 };
 
 std::vector<DateInformation::DayMonthYear> dateDropdown();
@@ -92,9 +90,10 @@ void combineDates(DateInformation::DayMonthYear &pastDate,DateInformation::DayMo
 DateInformation::DayMonthYear endDateDropdown(const std::string& startDate);
 void sameYearEndDateDropdown(DateInformation::EndDateDropdownPayload& payload);
 void differentYearEndDropdown(DateInformation::EndDateDropdownPayload& payload);
-void dateCheckConditions(const DateInformation::DayMonthYear &taskStart,int monthIndex,
-                         std::vector<std::string> &checkedDays,const std::vector<std::string>& yearsPast,
-                         const DateInformation::DaysPerMonth& daysPerMonth);
+void endDateDropdownUpdate(DateInformation::EndDateDropdownPayload &payload);
+void dateCheckConditions(int yearIndex,int realMonth,
+                         std::vector<std::string> &checkedDays,const std::vector<std::string> &yearsPast,
+                         const DateInformation::DaysPerMonth &daysPerMonth);
 
 
 
