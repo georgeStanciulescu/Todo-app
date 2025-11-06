@@ -2,6 +2,8 @@
 #include <Calculations.h>
 #include <Constants.h>
 
+#include "Interface.h"
+
 namespace InterfaceComposition
 {
     ftxui::Element makeVbox(const std::string& first)
@@ -20,12 +22,8 @@ namespace InterfaceComposition
                     text("ID") | bold | italic,
                        text("Task") | bold | italic ,
                        text("Status") | bold | italic,
-                       text("Start date") | bold | italic,
                        text("Due date") | bold | italic,
                        text("Days left") | bold | italic,
-                       text("Done date") | bold | italic,
-                        text("S-E date diff") | bold | italic,
-                        text("D-E date diff") | bold | italic
                 }};
 
         tableDataCalculations(tasks,tableContent);
@@ -59,9 +57,9 @@ namespace InterfaceComposition
 
         table.SelectAll().Border(LIGHT);
 
-        for (int x{0}; x < 8;++x) {
+        for (int x{0}; x < 5;++x) {
             table.SelectColumn(x).Border(LIGHT);
-            if (x != 1) table.SelectColumn(x).DecorateCells(center);
+            if (x != 1) {table.SelectColumn(x).DecorateCells(center);}
         }
         table.SelectRow(0).Border(LIGHT);
     }
@@ -102,16 +100,93 @@ namespace InterfaceComposition
         using namespace ftxui;
 
         values.push_back(text(std::format("{}",task.id)) | bold );
-        colour == Color::Default ? values.push_back(paragraph(task.description) | bold | flex | size(WIDTH,LESS_THAN,50)) //| size(WIDTH,LESS_THAN,50))
-                                    : values.push_back(paragraph(task.description)  | dim | flex | size(WIDTH,LESS_THAN,50));//| size(WIDTH,LESS_THAN,50));
+        colour == Color::Default ? values.push_back(paragraph(task.description) | bold | size(WIDTH,LESS_THAN,20)) //| size(WIDTH,LESS_THAN,50))
+                                    : values.push_back(paragraph(task.description)  | dim  | size(WIDTH,LESS_THAN,20));//| size(WIDTH,LESS_THAN,50));
         values.push_back(text(std::format("{}",task.completion)) | bold | color(colour));
-        values.push_back(text(task.date) | bold);
         values.push_back(text(task.dueDate) | bold);
         colour == Color::Default ? values.push_back(text(task.daysLeft) | bold)
                                     : values.push_back(text(task.daysLeft) | bold | strikethrough | color(colour));
-        values.push_back(text(task.endDate) | bold);
-        values.push_back(text(task.startDateEndDateDifference) | bold);
-        values.push_back(text(task.dueDateEndDateDifference) | bold);
+    }
+
+    void tabStatsCreation(const std::vector<TaskManager::Task> &tasks)
+    {
+        if (!tasks.empty()) std::cout << "\033[2J\033[H" << std::flush; // used to flush the screen
+
+        ftxui::Components taskContent{};
+        std::vector<std::string> ids{};
+
+        int idSelected{0};
+        auto tabMenu = ftxui::Menu(&ids, &idSelected) | ftxui::color(ftxui::Color::LightCoral) | ftxui::bold | ftxui:: italic;
+
+        for (auto &task: tasks)
+        {
+            ids.emplace_back(std::to_string(task.id));
+
+            std::string status{};
+            if (task.completion == Constants::ongoingMark){status = "ONGOING";}
+            else if (task.completion == Constants::failureMark){status = "FAILED";}
+            else{status = "SUCCEEDED";}
+
+            //if (std::stoi(task.daysLeft) < 0){}
+
+            taskContent.push_back(ftxui::Renderer([&task,status]
+                {
+                    return
+                            ftxui::vbox(
+                                ftxui::paragraph(std::format(
+                                    "Description: {}", task.description)),
+                                ftxui::text(std::format(
+                                    "Completion status: {}", status)),
+                                ftxui::text(
+                                    std::format("Start date: {}", task.date)),
+                                ftxui::text(
+                                    std::format("Due date: {}", task.dueDate)),
+                                ftxui::text(
+                                    std::format(
+                                        "Days left: {}", task.daysLeft)),
+                                ftxui::text(
+                                    std::format("End date: {}", task.endDate)),
+                                ftxui::text(std::format(
+                                    "S-E diff: {}",
+                                    task.startDateEndDateDifference)),
+                                ftxui::text(std::format(
+                                    "D-E diff: {}",
+                                    task.dueDateEndDateDifference))) | ftxui::bold;
+                }
+            ));
+        }
+        auto infoWindow = createInfoWindow();
+        auto info = makeComponent(infoWindow);
+        auto tabContainer = ftxui::Container::Tab({taskContent}, &idSelected);
+
+        auto totalContainer = ftxui::Container::Vertical({tabMenu, tabContainer});
+
+        auto renderer = Renderer(totalContainer, [&] {
+            return ftxui::vbox( {
+                        infoWindow | ftxui::notflex,
+                ftxui::hbox({
+                       tabMenu->Render(),
+                       ftxui::separator(),
+                       tabContainer->Render()
+                   }) | ftxui::border
+            });
+
+        });
+
+        auto screen = ftxui::ScreenInteractive::FitComponent();
+
+        renderer |= ftxui::CatchEvent([&](const ftxui::Event &event)
+        {
+            if (event == ftxui::Event::Escape) {
+                screen.Exit();
+                return true;
+            }
+            return false;
+        });
+
+        const auto noTaskMessage = ftxui::text("There are no tasks to display!") | ftxui::bold;
+
+        tasks.empty() ? Interface::displayText(noTaskMessage): screen.Loop(renderer);
     }
 
 }

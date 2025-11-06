@@ -16,6 +16,7 @@ ftxui::Component taskStartDate(DateInformation::DayMonthYear &dates,const std::v
                                const std::vector<std::string> &days,const std::vector<std::string> &months,
                                DateInformation::DateType calendarType);
 ftxui::Component makeComponent(ftxui::Element &element);
+ftxui::Component makeComponentVALUE(ftxui::Element element);
 ftxui::Component createDateDropdown(ftxui::Component& layout);
 ftxui::Component createDateDropdown(ftxui::Component& layout,ftxui::Component& dueDate);
 ftxui::Element createInfoWindow();

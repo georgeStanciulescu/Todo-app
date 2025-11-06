@@ -7,7 +7,8 @@
 
 namespace Interface {
 
-    void extraDetail(const TaskManager::DetailType type) {
+    void extraDetail(const TaskManager::DetailType type)
+    {
         using namespace ftxui;
         using enum TaskManager::DetailType;
         using namespace InterfaceComposition;
@@ -66,7 +67,8 @@ namespace Interface {
         }
     }
 
-    void successMessage(const TaskManager::DetailType type,const bool deleteAll) {
+    void successMessage(const TaskManager::DetailType type,const bool deleteAll)
+    {
         using enum TaskManager::DetailType;
         using namespace InterfaceComposition;
         switch (type) {
@@ -92,7 +94,8 @@ namespace Interface {
         }
     }
 
-    void exceptionErrorMessage(const ErrorHandling::ErrorType type,int line) {
+    void exceptionErrorMessage(const ErrorHandling::ErrorType type,int line)
+    {
         using enum ErrorHandling::ErrorType;
         using namespace InterfaceComposition;
 
@@ -132,7 +135,8 @@ namespace Interface {
         }
     }
 
-    void displayText(const ftxui::Element &printedText) {
+    void displayText(const ftxui::Element &printedText)
+    {
         using namespace ftxui;
 
         auto document = printedText;
@@ -146,7 +150,8 @@ namespace Interface {
         std::cout << '\n';
     }
 
-    void displayText(const ftxui::Component& printedText) {
+    void displayText(const ftxui::Component& printedText)
+    {
         using namespace ftxui;
 
         auto document = printedText;
@@ -160,7 +165,8 @@ namespace Interface {
         //std::cout << '\n';
     }
 
-    void changeTaskInput(std::string &descriptionToChange) {
+    void changeTaskInput(std::string &descriptionToChange)
+    {
         auto input = ftxui::Input(&descriptionToChange,
                                   "Edit task description");
         auto screen = ftxui::ScreenInteractive::TerminalOutput();
@@ -175,7 +181,8 @@ namespace Interface {
         screen.Loop(input);
     }
 
-    bool userWantsDuplicate(const bool isDuplicate) {
+    bool userWantsDuplicate(const bool isDuplicate)
+    {
         if (isDuplicate) {
             char duplicateAnswer{};
             std::cout <<
@@ -194,10 +201,12 @@ namespace Interface {
     }
 
 
-    void displayTotalList(const std::vector<TaskManager::Task> &tasks) {
+    void displayTotalList(const std::vector<TaskManager::Task> &tasks)
+    {
         using namespace ftxui;
         Element table{InterfaceComposition::listTableCreation(tasks)};
         Element progressBar{InterfaceComposition::progressBarCreation(tasks)};
+        InterfaceComposition::tabStatsCreation(tasks);
 
          displayText(vbox(
              text(""),
@@ -206,7 +215,6 @@ namespace Interface {
              table,
              progressBar | size(HEIGHT,EQUAL,10)
          ));
-
     }
 
     bool errorResponse(const TaskManager::DetailType type) {

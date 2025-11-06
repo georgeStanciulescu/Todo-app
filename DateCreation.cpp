@@ -36,6 +36,10 @@ ftxui::Component makeComponent(ftxui::Element &element)
 {
     return ftxui::Renderer([&element] { return element; });
 }
+ftxui::Component makeComponentVALUE(ftxui::Element element)
+{
+    return ftxui::Renderer([&element] { return element; });
+}
 
 ftxui::Component createDateDropdown(ftxui::Component& layout)
 {

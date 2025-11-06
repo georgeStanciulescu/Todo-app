@@ -14,6 +14,8 @@ namespace Constants
     inline constexpr char closedBrace{'}'};
     inline constexpr char openBracket{'['};
     inline constexpr char closedBracket{']'};
+    inline constexpr char pipeDelimiter{'|'};
+
 
     inline constexpr int minEndArgs{4};
     inline constexpr int minStartArgs{2};

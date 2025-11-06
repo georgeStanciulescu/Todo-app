@@ -30,7 +30,10 @@ namespace IO
         while (std::getline(myFile, myTask))
         {
             ++count;
-            tasks.push_back(taskReader(myTask,count));
+            TaskManager::Task task{taskReader(myTask,count)};
+            if (task.completion == Constants::ongoingMark){recalculateDaysLeft(task);}
+            tasks.push_back(task);
+            // tasks.push_back(taskReader(myTask,count));
         }
     }
 
@@ -42,44 +45,48 @@ namespace IO
         int id{};
         if (!(stream >> id)){Interface::exceptionErrorMessage(ErrorHandling::id,count);}
 
-        std::string description{};
-        if (!std::getline(stream,garbage,'{') || !std::getline(stream,description,'}'))
+        if (!std::getline(stream,garbage,Constants::pipeDelimiter))
          {
-            Interface::exceptionErrorMessage(ErrorHandling::description,count);
+            Interface::exceptionErrorMessage(ErrorHandling::status,count);
         }
         char status{};
         if (!(stream >> status)){Interface::exceptionErrorMessage(ErrorHandling::status,count);}
 
         std::string startDate{};
-        if (!std::getline(stream,garbage,'[') || !std::getline(stream,startDate,']'))
+        if (!std::getline(stream,garbage,Constants::pipeDelimiter) || !std::getline(stream,startDate,Constants::pipeDelimiter))
         {
             Interface::exceptionErrorMessage(ErrorHandling::startDate,count);
         }
         std::string dueDate{};
 
-        if (!std::getline(stream,dueDate,'{'))
+        if (!std::getline(stream,dueDate,Constants::pipeDelimiter))
         {
             Interface::exceptionErrorMessage(ErrorHandling::dueDate,count);
         }
         std::string presentToDueDate{};
-        if (!std::getline(stream,presentToDueDate,'}'))
+        if (!std::getline(stream,presentToDueDate,Constants::pipeDelimiter))
         {
             Interface::exceptionErrorMessage(ErrorHandling::daysLeft,count);
         }
         std::string endDate{};
-        if (!std::getline(stream,endDate,'['))
+        if (!std::getline(stream,endDate,Constants::pipeDelimiter))
         {
             Interface::exceptionErrorMessage(ErrorHandling::endDate,count);
         }
         std::string startDateEndDateDifference{};
-        if (!std::getline(stream,startDateEndDateDifference,']'))
+        if (!std::getline(stream,startDateEndDateDifference,Constants::pipeDelimiter))
         {
             Interface::exceptionErrorMessage(ErrorHandling::startDateEndDateDifference,count);
         }
         std::string dueDateEndDateDifference{};
-        if (!std::getline(stream,dueDateEndDateDifference))
+        if (!std::getline(stream,dueDateEndDateDifference,Constants::pipeDelimiter))
         {
-            dueDateEndDateDifference = "";
+            Interface::exceptionErrorMessage(ErrorHandling::dueDateEndDateDifference,count);
+        }
+        std::string description{};
+        if (!std::getline(stream,description))
+        {
+            Interface::exceptionErrorMessage(ErrorHandling::description,count);
         }
 
         return {id,description,status,startDate,dueDate,
@@ -99,11 +106,11 @@ namespace IO
 
         for (std::size_t x{0}; x < tasks.size(); ++x)
         {
-             tempFile  << x + 1 << openBrace << tasks[x].description << closedBrace
-                       << tasks[x].completion << openBracket << tasks[x].date << closedBracket
-                       << tasks[x].dueDate << openBrace << tasks[x].daysLeft << closedBrace
-                       << tasks[x].endDate << openBracket <<tasks[x].startDateEndDateDifference
-                       << closedBracket << tasks[x].dueDateEndDateDifference << '\n';
+            tempFile  << x + 1 << pipeDelimiter <<  tasks[x].completion << pipeDelimiter
+                      << tasks[x].date << pipeDelimiter << tasks[x].dueDate << pipeDelimiter
+                      << tasks[x].daysLeft << pipeDelimiter << tasks[x].endDate
+                      << pipeDelimiter <<tasks[x].startDateEndDateDifference << pipeDelimiter
+                      << tasks[x].dueDateEndDateDifference << pipeDelimiter << tasks[x].description << '\n';
         }
 
         std::filesystem::rename(tempPath,fileName);
@@ -128,7 +135,7 @@ namespace IO
         const auto taskDueDate = returnNumericDate(dueDateString);
 
         int startEndDifference{returnDateDifference(taskStartDate,taskEndDate)};
-        int dueEndDifference{returnDateDifference(taskDueDate,taskEndDate)};
+        int dueEndDifference{std::abs(returnDateDifference(taskDueDate,taskEndDate))};
 
         const int chosenTask{std::stoi(taskID)};
 
@@ -137,19 +144,19 @@ namespace IO
         for (const auto &task: tasks)
         {
             if (task.id != chosenTask) {
-                tempFile  << task.id << openBrace << task.description << closedBrace
-                          << task.completion << openBracket << task.date << closedBracket
-                          << task.dueDate << openBrace << task.daysLeft << closedBrace
-                          << task.endDate<< openBracket << task.startDateEndDateDifference
-                          << closedBracket << task.dueDateEndDateDifference << '\n';
+                tempFile  << task.id << pipeDelimiter << task.completion << pipeDelimiter
+                          << task.date << pipeDelimiter << task.dueDate << pipeDelimiter
+                          << task.daysLeft << pipeDelimiter << task.endDate<< pipeDelimiter
+                          << task.startDateEndDateDifference << pipeDelimiter
+                          << task.dueDateEndDateDifference << pipeDelimiter << task.description << '\n';
             }
             else
             {
-                tempFile << task.id << openBrace << endedTask <<  closedBrace
-                         << status << openBracket << task.date << closedBracket
-                         << task.dueDate << openBrace << task.daysLeft
-                         << closedBrace << taskEndDateString << openBracket << startEndDifference
-                         << closedBracket << dueEndDifference << '\n';
+                tempFile << task.id << pipeDelimiter << status << pipeDelimiter
+                         << task.date << pipeDelimiter << task.dueDate
+                         << pipeDelimiter << task.daysLeft << pipeDelimiter
+                         << taskEndDateString << pipeDelimiter << startEndDifference
+                         << pipeDelimiter << dueEndDifference << pipeDelimiter << endedTask << '\n';
             }
         }
 
@@ -167,15 +174,16 @@ namespace IO
         auto startDate = std::format("{}/{}/{}",dates[0].day ,dates[0].month ,dates[0].year);
         auto endDate = std::format("{}/{}/{}",dates[1].day,dates[1].month ,dates[1].year);
 
-        int daysLeft {presentToDueDate(dates[1])};
+        //int daysLeft {presentToDueDate(dates[1])};
 
-        tempFile << tasks.size() + 1 << openBrace;
+        tempFile << tasks.size() + 1 << pipeDelimiter << ongoingMark <<  pipeDelimiter << startDate
+                 <<  pipeDelimiter << endDate <<  pipeDelimiter << ' ' <<  pipeDelimiter
+                 << ' ' <<  pipeDelimiter << ' ' <<  pipeDelimiter << ' ' << pipeDelimiter;
+
         for (int x{2}; x < argc; ++x) {
             tempFile << argv[x] << " ";
         }
-        tempFile << closedBrace << ongoingMark << openBracket << startDate
-                 << closedBracket << endDate << openBrace << daysLeft << closedBrace
-                 << ' ' << openBracket << ' ' << closedBracket << '\n';
+        tempFile << '\n';
 
         //std::filesystem::rename(tempPath,Constants::fileName);
     }
@@ -197,11 +205,10 @@ namespace IO
 
         for (const auto &task: tasks)
         {
-            tempFile << task.id << openBrace << task.description << closedBrace << task.completion
-                     << openBracket << task.date << closedBracket << task.dueDate << openBrace
-                     << task.daysLeft << closedBrace << task.endDate << openBracket
-                     << task.startDateEndDateDifference << closedBracket
-                     << task.dueDateEndDateDifference << '\n';
+            tempFile << task.id << pipeDelimiter << task.completion << pipeDelimiter << task.date
+                     << pipeDelimiter << task.dueDate << pipeDelimiter  << task.daysLeft
+                     << pipeDelimiter << task.endDate << pipeDelimiter << task.startDateEndDateDifference
+                     << pipeDelimiter << task.dueDateEndDateDifference << pipeDelimiter << task.description << '\n';
         }
 
         std::filesystem::rename(tempPath,fileName);
@@ -221,6 +228,25 @@ namespace IO
     {
         const auto  dateSubstrings= returnDateSubstrings(date);
         return { std::stoi(dateSubstrings[0]),std::stoi(dateSubstrings[1]),std::stoi(dateSubstrings[2])};
+    }
+
+    void recalculateDaysLeft(std::vector<TaskManager::Task>& tasks)
+    {
+        for (auto& task : tasks)
+        {
+            std::vector dueDateSubstrings{returnDateSubstrings(task.dueDate)};
+            DateInformation::DayMonthYear dueDate{std::stoi(dueDateSubstrings[0]),std::stoi(dueDateSubstrings[1]),std::stoi(dueDateSubstrings[2])};
+            task.daysLeft = std::format("{}",presentToDueDate(dueDate));
+        }
+
+    }
+    void recalculateDaysLeft(TaskManager::Task& task)
+    {
+
+        std::vector dueDateSubstrings{returnDateSubstrings(task.dueDate)};
+        DateInformation::DayMonthYear dueDate{std::stoi(dueDateSubstrings[0]),std::stoi(dueDateSubstrings[1]),std::stoi(dueDateSubstrings[2])};
+        task.daysLeft = std::format("{}",presentToDueDate(dueDate));
+
     }
 
 }

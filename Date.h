@@ -86,14 +86,12 @@ void combineDates(DateInformation::DayMonthYear &pastDate,DateInformation::DayMo
                   ftxui::ScreenInteractive &screen, ftxui::Element &exceedDate,
                   ftxui::Component &combinedDates);
 
-
 DateInformation::DayMonthYear endDateDropdown(const std::string& startDate);
 void sameYearEndDateDropdown(DateInformation::EndDateDropdownPayload& payload);
 void differentYearEndDropdown(DateInformation::EndDateDropdownPayload& payload);
 void endDateDropdownUpdate(DateInformation::EndDateDropdownPayload &payload);
-void dateCheckConditions(int yearIndex,int realMonth,
-                         std::vector<std::string> &checkedDays,const std::vector<std::string> &yearsPast,
-                         const DateInformation::DaysPerMonth &daysPerMonth);
+void dateCheckConditions(int yearIndex,int realMonth,std::vector<std::string> &checkedDays,
+                         const std::vector<std::string> &yearsPast,const DateInformation::DaysPerMonth &daysPerMonth);
 
 
 
