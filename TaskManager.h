@@ -6,7 +6,7 @@
 
 class TaskManager {
 public:
-    enum DetailType
+    enum class DetailType
     {
         basic,
         add,
@@ -17,10 +17,11 @@ public:
         list,
     };
 
-    enum DeletionType {
+    enum class DeletionType {
         single,
         all,
     };
+
     struct Task
     {
         int id;
@@ -47,7 +48,8 @@ public:
     void endTask(const char* taskID,const char* status,const std::string& startDate,const std::string& dueDate);
     void addTask(char* argv[],int argc);
     void changeTask(const char* taskID);
-    void listTasks();
+    void listSimple();
+    void listDetailed();
     bool duplicateCheck(const char* duplicateArg);
 
 

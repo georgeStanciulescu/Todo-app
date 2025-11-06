@@ -17,6 +17,7 @@ namespace InterfaceComposition
     ftxui::Element progressBarCreation(const std::vector<TaskManager::Task>& tasks);
     void fillTableValues(const TaskManager::Task& task,ftxui::Elements& values,const ftxui::Color& colour);
     void tabStatsCreation(const std::vector<TaskManager::Task>& tasks);
+    ftxui::Element createListInfoWindow();
 }
 
 #endif //UNTITLED_INTERFACECOMPOSITION_H

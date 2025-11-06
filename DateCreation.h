@@ -19,7 +19,7 @@ ftxui::Component makeComponent(ftxui::Element &element);
 ftxui::Component makeComponentVALUE(ftxui::Element element);
 ftxui::Component createDateDropdown(ftxui::Component& layout);
 ftxui::Component createDateDropdown(ftxui::Component& layout,ftxui::Component& dueDate);
-ftxui::Element createInfoWindow();
+ftxui::Element createDateInfoWindow();
 
 std::vector<std::string> calculateYears(DateInformation::DateType dateType,int start = 0);
 std::vector<std::string> returnCalendarMonth(int count);

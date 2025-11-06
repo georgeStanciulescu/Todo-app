@@ -63,7 +63,14 @@ namespace Interface {
                     | bold
                 ));
                 break;
-            case list: break;
+            case list:
+                displayText(ftxui::vbox(
+                    text(""),
+                    text("Task list form: task list [optional extra]") | bold,
+                    text("Extra options: -d for the detailed list")
+                    | bold
+                ));
+                break;
         }
     }
 
@@ -206,7 +213,6 @@ namespace Interface {
         using namespace ftxui;
         Element table{InterfaceComposition::listTableCreation(tasks)};
         Element progressBar{InterfaceComposition::progressBarCreation(tasks)};
-        InterfaceComposition::tabStatsCreation(tasks);
 
          displayText(vbox(
              text(""),

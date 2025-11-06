@@ -36,10 +36,7 @@ ftxui::Component makeComponent(ftxui::Element &element)
 {
     return ftxui::Renderer([&element] { return element; });
 }
-ftxui::Component makeComponentVALUE(ftxui::Element element)
-{
-    return ftxui::Renderer([&element] { return element; });
-}
+
 
 ftxui::Component createDateDropdown(ftxui::Component& layout)
 {
@@ -61,7 +58,7 @@ ftxui::Component createDateDropdown(ftxui::Component& layout,ftxui::Component& d
          });
 }
 
-ftxui::Element createInfoWindow()
+ftxui::Element createDateInfoWindow()
 {
    return ftxui::window(ftxui::text("Info") | ftxui::bold,
                       ftxui::paragraph(

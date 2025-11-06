@@ -23,7 +23,7 @@ std::vector<DateInformation::DayMonthYear> dateDropdown() {
     DayMonthYear futureDate{};
 
     ftxui::Element exceedDate{ftxui::text("")};
-    auto infoWindow = createInfoWindow();
+    auto infoWindow = createDateInfoWindow();
 
     auto layout = taskStartDate(pastDate, yearsPast, daysPast, months, DateType::past);
     auto dueDate = taskStartDate(futureDate, yearsFuture, daysFuture, months, DateType::due);
@@ -122,7 +122,7 @@ DateInformation::DayMonthYear endDateDropdown(const std::string &startDate)
     auto checkedMonths{months.taskEnd};
     auto checkedDays{taskEndDays};
 
-    auto infoWindow = createInfoWindow();
+    auto infoWindow = createDateInfoWindow();
     const auto info = makeComponent(infoWindow);
 
     auto layout = taskStartDate(taskStart, yearsPast, checkedDays,checkedMonths, DateType::end);

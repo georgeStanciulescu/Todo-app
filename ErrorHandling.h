@@ -18,6 +18,7 @@ public:
         dueDateEndDateDifference,
         outOfRange,
     };
+
 private:
     const TaskManager& taskManager{};
 
@@ -32,8 +33,7 @@ public:
     [[nodiscard]] bool deleteErrorHandle(int totalArgs,char* deletionArg[]) const;
     [[nodiscard]] bool addErrorHandle(int totalArgs) const;
     [[nodiscard]] bool changeErrorHandle(int totalArgs,char* changeArg[]) const;
-
-    [[nodiscard]] bool duplicateCheck(const char* duplicateArg);
+    [[nodiscard]] bool listErrorHandle(int totalArgs, char* extraArg[]);
     [[nodiscard]] bool boundaryCheck(const char* boundaryArg) const;
 
 };

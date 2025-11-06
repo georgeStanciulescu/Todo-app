@@ -2,6 +2,8 @@
 #include <FileIO.h>
 #include <Interface.h>
 
+#include "InterfaceComposition.h"
+
 
 TaskManager::TaskManager()
 {
@@ -13,11 +15,11 @@ TaskManager::DeletionType TaskManager::deleteTask(const char* taskID)
     if (std::string_view(taskID) == "all")
     {
         IO::deleteAllTasksIO();
-        return all;
+        return DeletionType::all;
     }
 
     IO::deleteTaskIO(tasks,taskID);
-    return single;
+    return DeletionType::single;
 }
 
 void TaskManager::endTask(const char* taskID,const char* status,const std::string& startDate,const std::string& dueDate)
@@ -36,9 +38,14 @@ void TaskManager::changeTask(const char* taskID)
     IO::changeTaskIO(tasks,taskID);
 }
 
-void TaskManager::listTasks()
+void TaskManager::listSimple()
 {
     Interface::displayTotalList(tasks);
+}
+
+void TaskManager::listDetailed()
+{
+    InterfaceComposition::tabStatsCreation(tasks);
 }
 
 bool TaskManager::duplicateCheck(const char* duplicateArg)

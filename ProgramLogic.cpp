@@ -1,6 +1,7 @@
 #include <ProgramLogic.h>
 #include <ErrorHandling.h>
 #include <Interface.h>
+#include <iostream>
 
 
 #include "Constants.h"
@@ -29,7 +30,9 @@ ProgramResult programLogic(const int argc,char* argv[])
 
     switch (cmd) {
         case list:
-            tasker.listTasks();
+            if (!validator.listErrorHandle(argc,argv)){return failure;}
+
+            argc > 2 ?  tasker.listDetailed() : tasker.listSimple();
             break;
         case add:
             if (!validator.addErrorHandle(argc)){return failure;}
@@ -41,7 +44,7 @@ ProgramResult programLogic(const int argc,char* argv[])
         case deletion:
             if (!validator.deleteErrorHandle(argc,argv)){return failure;}
 
-            tasker.deleteTask(argv[2]) == TaskManager::all ? successMessage(deletion,true) :successMessage(deletion);
+            tasker.deleteTask(argv[2]) == TaskManager::DeletionType::all ? successMessage(deletion,true) :successMessage(deletion);
 
             break;
         case end: {
