@@ -31,6 +31,7 @@ namespace DateInformation {
         std::vector<std::string> full{};
         std::vector<std::string> taskStart{};
         std::vector<std::string> taskEnd{};
+        std::vector<std::string> inner{};
     };
 
     struct DayMonthYear {

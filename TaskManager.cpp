@@ -10,16 +10,14 @@ TaskManager::TaskManager()
     IO::fileIO(tasks);
 }
 
-TaskManager::DeletionType TaskManager::deleteTask(const char* taskID)
+void TaskManager::deleteTasks(const std::vector<int>& taskIDs)
 {
-    if (std::string_view(taskID) == "all")
-    {
-        IO::deleteAllTasksIO();
-        return DeletionType::all;
-    }
+    IO::deleteTasksIO(tasks,taskIDs);
+}
 
-    IO::deleteTaskIO(tasks,taskID);
-    return DeletionType::single;
+void TaskManager::deleteAllTasks()
+{
+    IO::deleteAllTasksIO();
 }
 
 void TaskManager::endTask(const char* taskID,const char* status,const std::string& startDate,const std::string& dueDate)
@@ -30,7 +28,6 @@ void TaskManager::endTask(const char* taskID,const char* status,const std::strin
 void TaskManager::addTask(char* argv[],int argc)
 {
     IO::addTaskIO(tasks,argv,argc);
-    //dateDropdown();
 }
 
 void TaskManager::changeTask(const char* taskID)
@@ -48,17 +45,19 @@ void TaskManager::listDetailed()
     InterfaceComposition::tabStatsCreation(tasks);
 }
 
+//make better;easy way to do so
 bool TaskManager::duplicateCheck(const char* duplicateArg)
 
 {
-    bool isDuplicate{false};
-
     for (const auto& task : tasks) {
 
-        if (task.description == std::string_view(duplicateArg)){isDuplicate = true;}
+        if (task.description == std::string_view(duplicateArg))
+        {
+            return Interface::userWantsDuplicate();
+        }
     }
 
-    return Interface::userWantsDuplicate(isDuplicate);
+    return true;
 }
 
 

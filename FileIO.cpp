@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <fstream>
 #include <TaskManager.h>
+#include <unordered_set>
 
 
 namespace IO
@@ -15,14 +16,15 @@ namespace IO
         if (!std::filesystem::exists(Constants::fileName)) {
             std::ofstream fileCreation(static_cast<std::string>(Constants::fileName));
             if (!fileCreation) {
-                throw std::runtime_error(
-                    "Error : The file has failed to be created!");
+                Interface::exceptionErrorMessage(ErrorHandling::failedCreation,0);
             }
         }
 
         std::ifstream myFile(static_cast<std::string>(Constants::fileName));
 
-        if (!myFile) {throw std::runtime_error("Error : The file has failed to open!");}
+        if (!myFile) {
+            Interface::exceptionErrorMessage(ErrorHandling::failedOpening,0);;
+        }
 
         int count{0};
         std::string myTask{};
@@ -33,7 +35,6 @@ namespace IO
             TaskManager::Task task{taskReader(myTask,count)};
             if (task.completion == Constants::ongoingMark){recalculateDaysLeft(task);}
             tasks.push_back(task);
-            // tasks.push_back(taskReader(myTask,count));
         }
     }
 
@@ -93,31 +94,34 @@ namespace IO
       presentToDueDate,endDate,startDateEndDateDifference,dueDateEndDateDifference};
     }
 
-    void deleteTaskIO(std::vector<TaskManager::Task> &tasks,const char *taskID)
+
+    void deleteAllTasksIO() {
+        std::filesystem::remove(static_cast<std::string>(Constants::fileName).c_str());
+    }
+
+    void deleteTasksIO(std::vector<TaskManager::Task> &tasks,const std::vector<int>& tasksIDs)
     {
         using namespace Constants;
 
         std::filesystem::path tempPath{"temp.txt"};
         std::ofstream tempFile(tempPath);
 
-        const int chosenTask{std::stoi(taskID) - 1};
+        std::unordered_set<int> ids{tasksIDs.begin(),tasksIDs.end()};
 
-        tasks.erase(tasks.begin() + chosenTask);
-
+        int deletionCounter{0};
         for (std::size_t x{0}; x < tasks.size(); ++x)
         {
-            tempFile  << x + 1 << pipeDelimiter <<  tasks[x].completion << pipeDelimiter
-                      << tasks[x].date << pipeDelimiter << tasks[x].dueDate << pipeDelimiter
-                      << tasks[x].daysLeft << pipeDelimiter << tasks[x].endDate
-                      << pipeDelimiter <<tasks[x].startDateEndDateDifference << pipeDelimiter
-                      << tasks[x].dueDateEndDateDifference << pipeDelimiter << tasks[x].description << '\n';
+            if (!ids.contains(x + 1)) {
+                tempFile  << (x +1) - deletionCounter << pipeDelimiter <<  tasks[x].completion << pipeDelimiter
+                                   << tasks[x].date << pipeDelimiter << tasks[x].dueDate << pipeDelimiter
+                                   << tasks[x].daysLeft << pipeDelimiter << tasks[x].endDate
+                                   << pipeDelimiter <<tasks[x].startDateEndDateDifference << pipeDelimiter
+                                   << tasks[x].dueDateEndDateDifference << pipeDelimiter << tasks[x].description << '\n';
+            }
+            else{++deletionCounter;}
         }
 
         std::filesystem::rename(tempPath,fileName);
-    }
-
-    void deleteAllTasksIO() {
-        std::filesystem::remove(static_cast<std::string>(Constants::fileName).c_str());
     }
 
     void endTaskIO(const std::vector<TaskManager::Task> &tasks,const char *taskID, const char *status,
@@ -181,7 +185,7 @@ namespace IO
                  << ' ' <<  pipeDelimiter << ' ' <<  pipeDelimiter << ' ' << pipeDelimiter;
 
         for (int x{2}; x < argc; ++x) {
-            tempFile << argv[x] << " ";
+            tempFile << argv[x] ;
         }
         tempFile << '\n';
 
@@ -230,16 +234,6 @@ namespace IO
         return { std::stoi(dateSubstrings[0]),std::stoi(dateSubstrings[1]),std::stoi(dateSubstrings[2])};
     }
 
-    void recalculateDaysLeft(std::vector<TaskManager::Task>& tasks)
-    {
-        for (auto& task : tasks)
-        {
-            std::vector dueDateSubstrings{returnDateSubstrings(task.dueDate)};
-            DateInformation::DayMonthYear dueDate{std::stoi(dueDateSubstrings[0]),std::stoi(dueDateSubstrings[1]),std::stoi(dueDateSubstrings[2])};
-            task.daysLeft = std::format("{}",presentToDueDate(dueDate));
-        }
-
-    }
     void recalculateDaysLeft(TaskManager::Task& task)
     {
 

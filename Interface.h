@@ -10,12 +10,12 @@
 namespace Interface
 {
     void displayText(const ftxui::Element& printedText);
-    void displayText(const ftxui::Component& printedText);
     void extraDetail(TaskManager::DetailType type);
-    void successMessage(TaskManager::DetailType type,bool deleteAll = false);
+    void successMessage(TaskManager::DetailType type,TaskManager::DeletionType deletionType = TaskManager::DeletionType::single);
     void changeTaskInput(std::string& descriptionToChange);
-    bool userWantsDuplicate(bool isDuplicate);
+    bool userWantsDuplicate();
     void displayTotalList(const std::vector<TaskManager::Task>& tasks);
+    void deletionMessage(TaskManager::DeletionType type);
     bool errorResponse(TaskManager::DetailType type);
     void exceptionErrorMessage(ErrorHandling::ErrorType type,int line);
 }

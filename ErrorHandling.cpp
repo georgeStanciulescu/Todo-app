@@ -1,5 +1,6 @@
 #include <ErrorHandling.h>
 #include <Constants.h>
+#include <format>
 #include <iostream>
 
 #include "Interface.h"
@@ -20,16 +21,22 @@ bool ErrorHandling::endErrorHandle(const int totalArgs,char* endArgs[]) const
     return true;
 }
 
-bool ErrorHandling::deleteErrorHandle(const int totalArgs,char* deletionArg[]) const
+
+bool ErrorHandling::deleteArgNumber(const int totalArgs) const
 {
     if (totalArgs < Constants::minGeneralArgs) {return Interface::errorResponse(TaskManager::DetailType::deletion);}
 
-    if (std::string_view(deletionArg[Constants::thirdArg]) == "all"){return true;}
-
-    if (!boundaryCheck(deletionArg[Constants::thirdArg])){return false;}
-
     return true;
 }
+
+bool ErrorHandling::deleteAllCheck(char* deletionArg) const
+{
+    if (std::string_view(deletionArg) == "all"){return true;}
+
+    return false;
+}
+
+
 
 bool ErrorHandling::addErrorHandle(const int totalArgs) const
 {
@@ -55,7 +62,7 @@ bool ErrorHandling::listErrorHandle(const int totalArgs,char* listArgs[])
 
     return true;
 }
-
+//might delete,and use the other function at the bottom
 bool ErrorHandling::boundaryCheck(const char* boundaryArg) const
 {
     try
@@ -66,10 +73,7 @@ bool ErrorHandling::boundaryCheck(const char* boundaryArg) const
             Interface::exceptionErrorMessage(outOfRange,0);
             return false;
         }
-    } catch (const std::invalid_argument&) {
-        Interface::exceptionErrorMessage(outOfRange,0);
-         return false;
-    } catch (const std::out_of_range&) {
+    } catch (const std::exception&) {
         Interface::exceptionErrorMessage(outOfRange,0);
         return false;
     }
@@ -82,6 +86,36 @@ bool ErrorHandling::programStartHandle(const int totalArgs) const
     if (totalArgs < Constants::minStartArgs) {return Interface::errorResponse(TaskManager::DetailType::basic);}
     return true;
 }
+
+std::vector<int> ErrorHandling::deleteArgBreakdown(const char* deleteArg) const
+{
+    const std::size_t count {taskManager.getTasks().size() };
+
+    std::istringstream stream{deleteArg};
+    std::string id{};
+    std::vector<int> ids{};
+    while (std::getline(stream,id,','))
+    {
+        try {
+            const int val{std::stoi(id)};
+
+            if (val < 1 || static_cast<std::size_t>(val) > count) {
+                Interface::exceptionErrorMessage(outOfRange,0);
+                return {};
+            }
+
+            ids.push_back(val);
+        } catch (const std::exception&) {
+            Interface::exceptionErrorMessage(ErrorHandling::incorrectArg,0);
+            return {};
+        }
+
+    }
+    std::cout << ids.size() << '\n';
+    return ids;
+}
+
+
 
 
 

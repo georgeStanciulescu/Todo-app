@@ -9,13 +9,7 @@ namespace Constants
     inline constexpr char successMark{'s'};
     inline constexpr char failureMark{'x'};
     inline constexpr char ongoingMark{'-'};
-
-    inline constexpr char openBrace{'{'};
-    inline constexpr char closedBrace{'}'};
-    inline constexpr char openBracket{'['};
-    inline constexpr char closedBracket{']'};
     inline constexpr char pipeDelimiter{'|'};
-
 
     inline constexpr int minEndArgs{4};
     inline constexpr int minStartArgs{2};
@@ -42,17 +36,6 @@ namespace Constants
   ╚██████╔╝██║        ██║   ██║╚██████╔╝██║ ╚████║███████║
    ╚═════╝ ╚═╝        ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
                                                         )"};
-
-    inline std::string& spaceAdder(std::string& ascii,int count)
-    {
-        for (int x{0}; x <= count;++x)
-        {
-            //ascii.append(" ");
-            ascii.insert(ascii.begin(),count,' ');
-        }
-
-        return ascii;
-    }
 
 }
 #endif //UNTITLED_CONSTANTS_H

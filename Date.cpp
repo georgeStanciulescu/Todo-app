@@ -104,9 +104,10 @@ DateInformation::DayMonthYear endDateDropdown(const std::string &startDate)
     Indices index{day - 1, month - 1,
         static_cast<int>(static_cast<unsigned int>(ymd.day())),
       static_cast<int>(static_cast<unsigned int>(ymd.month()))};
-    MonthNames months{            fullMonths,
-        std::vector(fullMonths.begin() + index.startMonth, fullMonths.end()),
-          std::vector(fullMonths.begin(),fullMonths.begin() + index.currentMonth)};
+    MonthNames months{      fullMonths,
+            std::vector(fullMonths.begin() + index.startMonth, fullMonths.end()),
+              std::vector(fullMonths.begin(),fullMonths.begin() + index.currentMonth),
+                std::vector(fullMonths.begin() + index.startMonth,fullMonths.begin() + index.currentMonth)};
     DayMonthYear taskStart{index.currentDay - 1, index.currentMonth, static_cast<int>(yearsPast.size() - 1)};
     DaysPerMonth daysPerMonth{};
 
@@ -150,6 +151,9 @@ DateInformation::DayMonthYear endDateDropdown(const std::string &startDate)
 
 void endDateDropdownUpdate(DateInformation::EndDateDropdownPayload &payload)
 {
+    std::cout << payload.checkedMonths.size() - 1 << '\n';
+    std::cout << payload.taskStart.year << " THE YEAR BEGINNING IS:" << '\n';
+    std::cout << payload.yearsPast.size() - 1 << "THE SIZE,BTICH IS:" << '\n';
     payload.layout |= ftxui::CatchEvent([&](const ftxui::Event &event)
         {
             if (event == ftxui::Event::Escape) {
@@ -158,13 +162,18 @@ void endDateDropdownUpdate(DateInformation::EndDateDropdownPayload &payload)
             }
 
             int realMonthIndex{};
-            if (payload.taskStart.year == 0) {
-                payload.checkedMonths = payload.months.taskStart;
+
+            if (payload.taskStart.year == payload.yearsPast.size() - 1 && payload.taskStart.year == 0 ) {
+                payload.checkedMonths = payload.months.inner;
                 realMonthIndex = payload.taskStart.month + payload.index.startMonth + 1;
             }
             else if (payload.taskStart.year == payload.yearsPast.size() - 1) {
-                payload.checkedMonths = payload.months.taskEnd;
-                realMonthIndex = payload.taskStart.month + 1;
+                    payload.checkedMonths = payload.months.taskEnd;
+                    realMonthIndex = payload.taskStart.month + 1;
+                }
+            else if (payload.taskStart.year == 0) {
+                payload.checkedMonths = payload.months.taskStart;
+                realMonthIndex = payload.taskStart.month + payload.index.startMonth + 1;
             }
             else {
                 payload.checkedMonths = payload.months.full;

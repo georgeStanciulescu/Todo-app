@@ -4,6 +4,9 @@
 #include "ftxui/component/component.hpp"
 #include "ftxui/component/screen_interactive.hpp"
 #include <iostream>
+#include <ranges>
+
+#include "TaskManager.h"
 
 namespace Interface {
 
@@ -74,18 +77,14 @@ namespace Interface {
         }
     }
 
-    void successMessage(const TaskManager::DetailType type,const bool deleteAll)
+    //might change;sending an int pointlessly when the user's not deleting
+    void successMessage(const TaskManager::DetailType type,const TaskManager::DeletionType deletionType)
     {
         using enum TaskManager::DetailType;
         using namespace InterfaceComposition;
         switch (type) {
             case deletion: {
-                const std::string listResponse{
-                    deleteAll
-                        ? "All the tasks have been successfully deleted!"
-                        : "The task has been successfully deleted!"
-                };
-                displayText(makeVbox(listResponse));
+                deletionMessage(deletionType);
                 break;
             }
             case end:
@@ -111,6 +110,15 @@ namespace Interface {
         switch (type) {
             case outOfRange:
                 displayText(makeVbox("The task ID cannot be found! Introduce an ID for a task in the list!"));
+                break;
+            case failedCreation:
+                displayText(makeVbox("The file has failed to be created!"));
+                break;
+            case failedOpening:
+                displayText(makeVbox("The file has failed to be opened!"));
+                break;
+            case incorrectArg:
+                displayText(makeVbox("The provided arguments are not ids!"));
                 break;
             case id:
                 displayText(makeVbox(std::format("Line {}:missing or invalid id",line)));
@@ -157,21 +165,6 @@ namespace Interface {
         std::cout << '\n';
     }
 
-    void displayText(const ftxui::Component& printedText)
-    {
-        using namespace ftxui;
-
-        auto document = printedText;
-        auto screen = ScreenInteractive::TerminalOutput();
-
-        auto container = Container::Vertical({document});
-
-        //Render(screen, document);
-        screen.Loop(container);
-
-        //std::cout << '\n';
-    }
-
     void changeTaskInput(std::string &descriptionToChange)
     {
         auto input = ftxui::Input(&descriptionToChange,
@@ -181,29 +174,36 @@ namespace Interface {
         input |= ftxui::CatchEvent([&](const ftxui::Event &event) {
             if (event == ftxui::Event::Return) {
                 screen.Exit();
-                return true; // Consume the event and exit
+                return true;
             }
-            return false; // Let other events pass through
+            return false;
         });
         screen.Loop(input);
     }
 
-    bool userWantsDuplicate(const bool isDuplicate)
+    bool userWantsDuplicate()
     {
-        if (isDuplicate) {
-            char duplicateAnswer{};
-            std::cout <<
-                    "There seems to be a task with the name just entered.Would you like to another task with the same name?(Y/n)";
-            std::cin >> duplicateAnswer;
+        std::string secondChar{};
+        displayText(ftxui::paragraph(
+                        "There seems to be a task with the name just entered.\n"
+                        "Would you like to add another task with the same name?(Y/n)")
+                    | ftxui::bold);
 
-            if (duplicateAnswer == 'n' || duplicateAnswer == 'N') {
-                return false;
+        while (true) {
+            std::cin >> secondChar;
+
+            if (secondChar.size() == 1 && (
+                    secondChar == "n" || secondChar == "y" ||
+                    secondChar == "N" || secondChar == "Y")) {
+                break;
             }
-            if (duplicateAnswer == 'Y' || duplicateAnswer == 'y') {
-                return true;
-            }
+
+            displayText(
+                ftxui::text("The only valid answers aresss Y/n") | ftxui::bold);
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
 
+        if (secondChar == "n" || secondChar == "N"){return false;}
         return true;
     }
 
@@ -223,10 +223,32 @@ namespace Interface {
          ));
     }
 
+    void deletionMessage(const TaskManager::DeletionType type)
+    {
+
+        switch (type) {
+            case TaskManager::DeletionType::single:
+                displayText(InterfaceComposition::makeVbox(
+                    "The task has been successfully deleted!") | ftxui::bold);
+                break;
+            case TaskManager::DeletionType::multiple:
+                displayText(InterfaceComposition::makeVbox(
+                    "The tasks have been successfully deleted!") | ftxui::bold);
+                break;
+            case TaskManager::DeletionType::all:
+                displayText(InterfaceComposition::makeVbox(
+                    "All the tasks have been successfully deleted!") | ftxui::bold);
+                break;
+        }
+
+    }
+
     bool errorResponse(const TaskManager::DetailType type) {
         extraDetail(type);
         return false;
     }
+
+
 }
 
 

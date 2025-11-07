@@ -17,6 +17,9 @@ public:
         startDateEndDateDifference,
         dueDateEndDateDifference,
         outOfRange,
+        failedCreation,
+        failedOpening,
+        incorrectArg,
     };
 
 private:
@@ -30,11 +33,13 @@ public:
 
     [[nodiscard]] bool programStartHandle(int totalArgs) const;
     bool endErrorHandle(int totalArgs,char* endArgs[]) const;
-    [[nodiscard]] bool deleteErrorHandle(int totalArgs,char* deletionArg[]) const;
     [[nodiscard]] bool addErrorHandle(int totalArgs) const;
     [[nodiscard]] bool changeErrorHandle(int totalArgs,char* changeArg[]) const;
     [[nodiscard]] bool listErrorHandle(int totalArgs, char* extraArg[]);
     [[nodiscard]] bool boundaryCheck(const char* boundaryArg) const;
+    [[nodiscard]] bool deleteArgNumber(int totalArgs) const;
+    bool deleteAllCheck(char* deletionArg) const;
+    std::vector<int> deleteArgBreakdown(const char* deleteArg) const;
 
 };
 

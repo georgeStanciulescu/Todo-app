@@ -1,6 +1,7 @@
 #include <InterfaceComposition.h>
 #include <Calculations.h>
 #include <Constants.h>
+#include <iostream>
 
 #include "Interface.h"
 
@@ -108,12 +109,13 @@ namespace InterfaceComposition {
         using namespace ftxui;
 
         values.push_back(text(std::format("{}", task.id)) | bold);
+        //the symbol after the description is used for clarity when reading from the list
         colour == Color::Default
             ? values.push_back(
-                paragraph(task.description) | bold | size(WIDTH, LESS_THAN, 20))
+                paragraph(task.description + " 𝔡")  | bold | size(WIDTH, LESS_THAN, 40))
             //| size(WIDTH,LESS_THAN,50))
             : values.push_back(
-                paragraph(task.description) | dim | size(WIDTH, LESS_THAN, 20));
+                paragraph(task.description + " 𝔡")  | dim | size(WIDTH, LESS_THAN, 40));
         //| size(WIDTH,LESS_THAN,50));
         values.push_back(
             text(std::format("{}", task.completion)) | bold | color(colour));
@@ -147,8 +149,8 @@ namespace InterfaceComposition {
             std::string daysLeft{};
             std::string daysOrNot{};
             std::stoi(task.daysLeft) < 0
-                ? daysLeft = "†Days late:"
-                : daysLeft = "†Days left:";
+                ? daysLeft = "† Days late:"
+                : daysLeft = "† Days left:";
 
             if (task.completion == Constants::ongoingMark) {
                 status = ftxui::text("ONGOING") | ftxui::bold | ftxui::color(

@@ -19,6 +19,7 @@ public:
 
     enum class DeletionType {
         single,
+        multiple,
         all,
     };
 
@@ -44,7 +45,8 @@ public:
     [[nodiscard]]std::string getEndDate(const int id) const {return tasks[id].endDate;}
     [[nodiscard]]std::string getDueDate(const int id) const {return tasks[id].dueDate;}
 
-    DeletionType deleteTask(const char* taskID);
+    void deleteAllTasks();
+    void deleteTasks(const std::vector<int>& taskIDs);
     void endTask(const char* taskID,const char* status,const std::string& startDate,const std::string& dueDate);
     void addTask(char* argv[],int argc);
     void changeTask(const char* taskID);

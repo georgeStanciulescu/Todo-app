@@ -17,18 +17,16 @@ ProgramResult programLogic(const int argc,char* argv[])
 
     if (!validator.programStartHandle(argc)){return failure;};
 
-    std::string_view input{argv[1]};
+    const std::string_view input{argv[1]};
 
-    auto choice = commandChoice(input);
+    const auto choice = commandChoice(input);
     if (!choice)
     {
         extraDetail(basic);
         return failure;
     }
 
-    TaskManager::DetailType cmd{*choice};
-
-    switch (cmd) {
+    switch (*choice) {
         case list:
             if (!validator.listErrorHandle(argc,argv)){return failure;}
 
@@ -41,12 +39,22 @@ ProgramResult programLogic(const int argc,char* argv[])
             tasker.addTask(argv,argc);
             successMessage(add);
             break;
-        case deletion:
-            if (!validator.deleteErrorHandle(argc,argv)){return failure;}
+        case deletion: {
+            if (!validator.deleteArgNumber(argc)){return failure;}
+            if (validator.deleteAllCheck(argv[2])) {
+                tasker.deleteAllTasks();
+                successMessage(deletion,TaskManager::DeletionType::all);
+            }
 
-            tasker.deleteTask(argv[2]) == TaskManager::DeletionType::all ? successMessage(deletion,true) :successMessage(deletion);
+            const auto ids = validator.deleteArgBreakdown(argv[2]);
 
+            if (ids.empty()){return failure;}
+
+            tasker.deleteTasks(ids);
+            if (ids.size() == 1){successMessage(deletion,TaskManager::DeletionType::single);}
+            else{successMessage(deletion,TaskManager::DeletionType::multiple);}
             break;
+        }
         case end: {
             if (!validator.endErrorHandle(argc,argv)){return failure;}
 
@@ -75,7 +83,7 @@ ProgramResult programLogic(const int argc,char* argv[])
     return success;
 }
 
-std::optional<TaskManager::DetailType> commandChoice(std::string_view userInput)
+std::optional<TaskManager::DetailType> commandChoice(const std::string_view userInput)
 {
     using enum TaskManager::DetailType;
     if (userInput == "list"){return list;}
