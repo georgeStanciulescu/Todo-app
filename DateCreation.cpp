@@ -7,9 +7,9 @@ ftxui::Component taskStartDate(DateInformation::DayMonthYear &dates,const std::v
                                const std::vector<std::string> &days,const std::vector<std::string> &months,
                                const DateInformation::DateType calendarType) {
     using namespace ftxui;
-    Component dayDrop = Dropdown((&days), &dates.day);
-    Component monthDrop = Dropdown(&months, &dates.month);
-    Component yearDrop = Dropdown(&years, &dates.year);
+    const auto dayDrop = Dropdown((&days), &dates.day);
+    const auto monthDrop = Dropdown(&months, &dates.month);
+    const auto yearDrop = Dropdown(&years, &dates.year);
 
     std::string title{};
     if (calendarType ==
@@ -130,8 +130,8 @@ std::vector<int> leapYearBetweenDates(const int start, const int end)
 
 //Kinda hacky,if one's purpose were to use this function outside of the FTXUI-bound,indexed approach
 // past.year and future.year are both indices into yearsPast and yearsFuture;thus if they both equal zero,they're the same year
-bool isPastGreater(DateInformation::DayMonthYear &past,
-                   DateInformation::DayMonthYear &future)
+bool isPastGreater(const DateInformation::DayMonthYear &past,
+                   const DateInformation::DayMonthYear &future)
 {
     if (past.year == 0 && future.year == 0)
     {
@@ -161,12 +161,12 @@ std::chrono::year_month_day returnPresentDate()
 
 DateInformation::DayMonthYear returnStartDateInt(const std::string &startDate)
 {
-    const std::size_t dayEnd{startDate.find_first_of('/')};
-    const std::size_t monthEnd{startDate.find_last_of('/')};
+    const auto dayEnd{startDate.find_first_of('/')};
+    const auto monthEnd{startDate.find_last_of('/')};
 
-    std::string day{startDate.substr(0, dayEnd)};
-    std::string month{startDate.substr(dayEnd + 1, monthEnd - dayEnd - 1)};
-    std::string year{startDate.substr(monthEnd + 1)};
+    const auto day{startDate.substr(0, dayEnd)};
+    const auto month{startDate.substr(dayEnd + 1, monthEnd - dayEnd - 1)};
+    const auto year{startDate.substr(monthEnd + 1)};
 
     return {std::stoi(day), std::stoi(month), std::stoi(year)};
 }

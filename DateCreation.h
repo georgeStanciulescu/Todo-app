@@ -26,7 +26,7 @@ std::vector<std::string> returnMonthNames();
 std::vector<int> leapYearBetweenDates(int start,int end);
 
 
-bool isPastGreater(DateInformation::DayMonthYear &past,DateInformation::DayMonthYear &future);
+bool isPastGreater(const DateInformation::DayMonthYear &past,const DateInformation::DayMonthYear &future);
 int daysNumberFirstMonth(int startMonth, int year);
 std::chrono::year_month_day returnPresentDate();
 

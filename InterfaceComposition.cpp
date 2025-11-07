@@ -113,10 +113,8 @@ namespace InterfaceComposition {
         colour == Color::Default
             ? values.push_back(
                 paragraph(task.description + " 𝔡")  | bold | size(WIDTH, LESS_THAN, 40))
-            //| size(WIDTH,LESS_THAN,50))
             : values.push_back(
                 paragraph(task.description + " 𝔡")  | dim | size(WIDTH, LESS_THAN, 40));
-        //| size(WIDTH,LESS_THAN,50));
         values.push_back(
             text(std::format("{}", task.completion)) | bold | color(colour));
         colour == Color::Default
@@ -131,87 +129,19 @@ namespace InterfaceComposition {
 
     void tabStatsCreation(const std::vector<TaskManager::Task> &tasks) {
         if (!tasks.empty()) std::cout << "\033[2J\033[H" << std::flush;
-        // used to flush the screen
 
-        ftxui::Components taskContent{};
-        std::vector<std::string> ids{};
+        const auto tab { createTabContent(tasks)};
 
         int idSelected{0};
-        auto tabMenu = ftxui::Menu(&ids, &idSelected) | ftxui::color(
-                           ftxui::Color::LightCoral) | ftxui::bold |
-                       ftxui::italic;
+        const auto tabMenu = ftxui::Menu(&tab.ids, &idSelected) | ftxui::color(
+                           ftxui::Color::LightCoral) | ftxui::bold | ftxui::italic;
 
-        for (auto &task: tasks) {
-            ids.emplace_back(std::to_string(task.id));
-
-            ftxui::Element status{};
-            ftxui::Color descriptionColour{};
-            std::string daysLeft{};
-            std::string daysOrNot{};
-            std::stoi(task.daysLeft) < 0
-                ? daysLeft = "† Days late:"
-                : daysLeft = "† Days left:";
-
-            if (task.completion == Constants::ongoingMark) {
-                status = ftxui::text("ONGOING") | ftxui::bold | ftxui::color(
-                             ftxui::Color::Cornsilk1);
-                descriptionColour = ftxui::Color::Default;
-            } else if (task.completion == Constants::failureMark) {
-                status = ftxui::text("FAILURE") | ftxui::bold | ftxui::color(
-                             ftxui::Color::Red);
-                daysOrNot = "days";
-            } else {
-                status = ftxui::text("SUCCESS") | ftxui::bold | ftxui::color(
-                             ftxui::Color::Green);
-                daysOrNot = "days";
-            }
-
-            constexpr std::size_t maxSize{60};
-            // could be made better;suffices for now
-            const auto sizeDescription = task.description.size();
-
-            ftxui::Elements extraPadding{};
-
-            for (std::size_t x{0}; x < sizeDescription / maxSize; ++x) {
-                extraPadding.push_back(ftxui::text(""));
-            }
-
-            ftxui::Element statusBox = ftxui::hbox(
-                ftxui::text("Completion status: "), status);
-
-            taskContent.push_back(ftxui::Renderer(
-                [&task,daysLeft,statusBox,daysOrNot,extraPadding] {
-                    return
-                            ftxui::vbox(
-                                ftxui::paragraph(std::format(
-                                    "Description: {}", task.description)),
-                                statusBox,
-                                ftxui::text(
-                                    std::format("Start date: {}", task.date)),
-                                ftxui::text(
-                                    std::format("Due date: {}", task.dueDate)),
-                                ftxui::text(
-                                    std::format(
-                                        "{} {} days", daysLeft,
-                                        std::abs(std::stoi(task.daysLeft)))),
-                                ftxui::text(
-                                    std::format("End date: {}", task.endDate)),
-                                ftxui::text(std::format(
-                                    "Actual time to complete: {} {}",
-                                    task.startDateEndDateDifference,
-                                    daysOrNot)),
-                                ftxui::text(std::format(
-                                    "Time over/earlier than expected: {} {}",
-                                    task.dueDateEndDateDifference, daysOrNot)),
-                                extraPadding) | ftxui::bold;
-                }
-            ));
-        }
         auto infoWindow = createListInfoWindow();
         const auto info = makeComponent(infoWindow);
-        auto tabContainer = ftxui::Container::Tab(taskContent, &idSelected);
+        const auto tabContainer = ftxui::Container::Tab(tab.taskContent, &idSelected);
 
-        auto totalContainer = ftxui::Container::Vertical(
+
+        const auto totalContainer = ftxui::Container::Vertical(
             {tabMenu, tabContainer});
 
         auto renderer = Renderer(totalContainer, [&] {
@@ -224,7 +154,6 @@ namespace InterfaceComposition {
                 }) | ftxui::border
             });
         });
-
 
         auto screen = ftxui::ScreenInteractive::FitComponent();
 
@@ -239,9 +168,93 @@ namespace InterfaceComposition {
         const auto noTaskMessage =
                 ftxui::text("There are no tasks to display!") | ftxui::bold;
 
-        tasks.empty()
-            ? Interface::displayText(noTaskMessage)
-            : screen.Loop(renderer);
+        tasks.empty() ? Interface::displayText(noTaskMessage)
+                      : screen.Loop(renderer);
+    }
+
+    TabContent createTabContent(const std::vector<TaskManager::Task> &tasks)
+    {
+        TabContent tab{};
+
+         for (const auto &task: tasks) {
+            tab.ids.push_back(std::to_string(task.id));
+
+            const int daysLeftNum {std::stoi(task.daysLeft)};
+
+            const std::string_view daysLeft{lateOrLeft(daysLeftNum)};
+            std::string_view daysOrNot{};
+
+            if (task.completion != Constants::ongoingMark){daysOrNot = "days";}
+
+            const auto extraPadding = createExtraPadding(task.description.size());
+
+            const auto statusBox{createStatusBox(task.completion)};
+
+            tab.taskContent.push_back(ftxui::Renderer(
+                [&task,daysLeft,statusBox,daysOrNot,extraPadding,daysLeftNum] {
+                    return
+                            ftxui::vbox(
+                                ftxui::paragraph(std::format(
+                                    "Description: {}", task.description)),
+                                statusBox,
+                                ftxui::text(
+                                    std::format("Start date: {}", task.date)),
+                                ftxui::text(
+                                    std::format("Due date: {}", task.dueDate)),
+                                ftxui::text(
+                                    std::format(
+                                        "{} {} days", daysLeft,
+                                        std::abs(daysLeftNum))),
+                                ftxui::text(
+                                    std::format("End date: {}", task.endDate)),
+                                ftxui::text(std::format(
+                                    "Actual time to complete: {} {}",
+                                    task.startDateEndDateDifference,
+                                    daysOrNot)),
+                                ftxui::text(std::format(
+                                    "Time over/earlier than expected: {} {}",
+                                    task.dueDateEndDateDifference, daysOrNot)),
+                                extraPadding) | ftxui::bold;
+                }
+            ));
+        }
+        return tab;
+    }
+
+    ftxui::Element createStatusBox(const char completion)
+    {
+        ftxui::Element status{};
+
+        if (completion == Constants::ongoingMark) {
+            status = ftxui::text("ONGOING") | ftxui::bold | ftxui::color(
+                         ftxui::Color::Cornsilk1);
+        } else if (completion == Constants::failureMark) {
+            status = ftxui::text("FAILURE") | ftxui::bold | ftxui::color(
+                         ftxui::Color::Red);
+        } else {
+            status = ftxui::text("SUCCESS") | ftxui::bold | ftxui::color(
+                         ftxui::Color::Green);
+        }
+
+        return ftxui::hbox(ftxui::text("Completion status: "), status);
+    }
+
+    ftxui::Elements createExtraPadding(const std::size_t descriptionSize)
+    {
+        constexpr std::size_t maxSize{60};
+
+        ftxui::Elements extraPadding{};
+
+        for (std::size_t x{0}; x < descriptionSize / maxSize; ++x) {
+            extraPadding.push_back(ftxui::text(""));
+        }
+
+        return extraPadding;
+    }
+
+    std::string_view lateOrLeft(const int daysLeft)
+    {
+        return daysLeft < 0 ? "† Days late:" : "† Days left:";
     }
 
     ftxui::Element createListInfoWindow() {

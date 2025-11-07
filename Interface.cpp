@@ -183,18 +183,18 @@ namespace Interface {
 
     bool userWantsDuplicate()
     {
-        std::string secondChar{};
+        std::string input{};
         displayText(ftxui::paragraph(
                         "There seems to be a task with the name just entered.\n"
                         "Would you like to add another task with the same name?(Y/n)")
                     | ftxui::bold);
 
         while (true) {
-            std::cin >> secondChar;
+            std::cin >> input;
 
-            if (secondChar.size() == 1 && (
-                    secondChar == "n" || secondChar == "y" ||
-                    secondChar == "N" || secondChar == "Y")) {
+            if (input.size() == 1 && (
+                    input == "n" || input == "y" ||
+                    input == "N" || input == "Y")) {
                 break;
             }
 
@@ -203,7 +203,7 @@ namespace Interface {
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
 
-        if (secondChar == "n" || secondChar == "N"){return false;}
+        if (input == "n" || input == "N"){return false;}
         return true;
     }
 
@@ -211,8 +211,8 @@ namespace Interface {
     void displayTotalList(const std::vector<TaskManager::Task> &tasks)
     {
         using namespace ftxui;
-        Element table{InterfaceComposition::listTableCreation(tasks)};
-        Element progressBar{InterfaceComposition::progressBarCreation(tasks)};
+        const Element table{InterfaceComposition::listTableCreation(tasks)};
+        const Element progressBar{InterfaceComposition::progressBarCreation(tasks)};
 
          displayText(vbox(
              text(""),

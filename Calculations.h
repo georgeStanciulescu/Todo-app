@@ -36,7 +36,6 @@ inline int returnDateDifference(const DateInformation::DayMonthYear& start,const
     const auto dayDifference = dueDate - startDate;
 
     return static_cast<int>(dayDifference.count());
-
 }
 
 #endif //UNTITLED_CALCULATIONS_H

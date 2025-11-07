@@ -43,7 +43,7 @@ std::vector<DateInformation::DayMonthYear> dateDropdown() {
     auto combinedDates = createDateDropdown(layout,dueDate);
     combineDates(pastDate, futureDate, screen, exceedDate, combinedDates);
 
-    auto total = ftxui::Container::Vertical({
+    const auto total = ftxui::Container::Vertical({
         info,
         combinedDates,
         makeComponent(exceedDate)
@@ -111,7 +111,7 @@ DateInformation::DayMonthYear endDateDropdown(const std::string &startDate)
     DayMonthYear taskStart{index.currentDay - 1, index.currentMonth, static_cast<int>(yearsPast.size() - 1)};
     DaysPerMonth daysPerMonth{};
 
-    int daysInMonth{daysNumberFirstMonth(index.startMonth, year)};
+    const auto daysInMonth{daysNumberFirstMonth(index.startMonth, year)};
 
     // the days in the month remaining for the start date and the days in the month up to the date for the end date
     auto taskStartDays = std::vector(daysPerMonth.thirtyOne.begin() + index.startDay,
@@ -140,7 +140,7 @@ DateInformation::DayMonthYear endDateDropdown(const std::string &startDate)
 
     endDateDropdownUpdate(payload);
 
-    auto total = ftxui::Container::Vertical({info,finalLayout});
+    const auto total = ftxui::Container::Vertical({info,finalLayout});
 
     screen.Loop(total);
 
@@ -151,9 +151,7 @@ DateInformation::DayMonthYear endDateDropdown(const std::string &startDate)
 
 void endDateDropdownUpdate(DateInformation::EndDateDropdownPayload &payload)
 {
-    std::cout << payload.checkedMonths.size() - 1 << '\n';
-    std::cout << payload.taskStart.year << " THE YEAR BEGINNING IS:" << '\n';
-    std::cout << payload.yearsPast.size() - 1 << "THE SIZE,BTICH IS:" << '\n';
+
     payload.layout |= ftxui::CatchEvent([&](const ftxui::Event &event)
         {
             if (event == ftxui::Event::Escape) {

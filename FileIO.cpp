@@ -33,7 +33,12 @@ namespace IO
         {
             ++count;
             TaskManager::Task task{taskReader(myTask,count)};
-            if (task.completion == Constants::ongoingMark){recalculateDaysLeft(task);}
+
+            if (task.completion == Constants::ongoingMark) {
+                const auto dueDateInt{returnNumericDate(task.dueDate)};
+                task.daysLeft = std::format("{}",presentToDueDate(dueDateInt));
+            }
+
             tasks.push_back(task);
         }
     }
@@ -106,7 +111,7 @@ namespace IO
         std::filesystem::path tempPath{"temp.txt"};
         std::ofstream tempFile(tempPath);
 
-        std::unordered_set<int> ids{tasksIDs.begin(),tasksIDs.end()};
+        const std::unordered_set<int> ids{tasksIDs.begin(),tasksIDs.end()};
 
         int deletionCounter{0};
         for (std::size_t x{0}; x < tasks.size(); ++x)
@@ -132,16 +137,16 @@ namespace IO
         std::filesystem::path tempPath{"temp.txt"};
         std::ofstream tempFile(tempPath);
 
-        DateInformation::DayMonthYear taskEndDate{endDateDropdown(startDateString)};
+        const auto taskEndDate{endDateDropdown(startDateString)};
         const auto taskEndDateString{std::format("{}/{}/{}",taskEndDate.day,taskEndDate.month,taskEndDate.year)};
 
         const auto taskStartDate = returnNumericDate(startDateString);
         const auto taskDueDate = returnNumericDate(dueDateString);
 
-        int startEndDifference{returnDateDifference(taskStartDate,taskEndDate)};
-        int dueEndDifference{std::abs(returnDateDifference(taskDueDate,taskEndDate))};
+        const auto startEndDifference{returnDateDifference(taskStartDate,taskEndDate)};
+        const auto dueEndDifference{std::abs(returnDateDifference(taskDueDate,taskEndDate))};
 
-        const int chosenTask{std::stoi(taskID)};
+        const auto chosenTask{std::stoi(taskID)};
 
         const std::string_view endedTask{tasks[chosenTask - 1].description};
 
@@ -173,12 +178,10 @@ namespace IO
         //std::filesystem::path tempPath{"temp.txt"};
         std::ofstream tempFile(static_cast<std::string>(fileName), std::ios::app);
 
-        auto dates = dateDropdown();
+        const auto dates = dateDropdown();
 
-        auto startDate = std::format("{}/{}/{}",dates[0].day ,dates[0].month ,dates[0].year);
-        auto endDate = std::format("{}/{}/{}",dates[1].day,dates[1].month ,dates[1].year);
-
-        //int daysLeft {presentToDueDate(dates[1])};
+        const auto startDate = std::format("{}/{}/{}",dates[0].day ,dates[0].month ,dates[0].year);
+        const auto endDate = std::format("{}/{}/{}",dates[1].day,dates[1].month ,dates[1].year);
 
         tempFile << tasks.size() + 1 << pipeDelimiter << ongoingMark <<  pipeDelimiter << startDate
                  <<  pipeDelimiter << endDate <<  pipeDelimiter << ' ' <<  pipeDelimiter
@@ -192,7 +195,6 @@ namespace IO
         //std::filesystem::rename(tempPath,Constants::fileName);
     }
 
-
     void changeTaskIO(std::vector<TaskManager::Task> &tasks,const char *taskID)
     {
 
@@ -200,7 +202,7 @@ namespace IO
         std::filesystem::path tempPath{"temp.txt"};
         std::ofstream tempFile(tempPath);
 
-        int chosenTask{std::stoi(taskID) - 1};
+        const auto chosenTask{std::stoi(taskID) - 1};
         std::string descriptionToChange{tasks[chosenTask].description};
 
         Interface::changeTaskInput(descriptionToChange);
@@ -220,8 +222,8 @@ namespace IO
 
     std::vector<std::string> returnDateSubstrings(const std::string& date)
     {
-        const std::size_t dayEnd{date.find_first_of('/')};
-        const std::size_t monthEnd{date.find_last_of('/')};
+        const auto dayEnd{date.find_first_of('/')};
+        const auto monthEnd{date.find_last_of('/')};
 
         return { date.substr(0,dayEnd),
                     date.substr(dayEnd + 1,monthEnd - dayEnd - 1),
@@ -232,15 +234,6 @@ namespace IO
     {
         const auto  dateSubstrings= returnDateSubstrings(date);
         return { std::stoi(dateSubstrings[0]),std::stoi(dateSubstrings[1]),std::stoi(dateSubstrings[2])};
-    }
-
-    void recalculateDaysLeft(TaskManager::Task& task)
-    {
-
-        std::vector dueDateSubstrings{returnDateSubstrings(task.dueDate)};
-        DateInformation::DayMonthYear dueDate{std::stoi(dueDateSubstrings[0]),std::stoi(dueDateSubstrings[1]),std::stoi(dueDateSubstrings[2])};
-        task.daysLeft = std::format("{}",presentToDueDate(dueDate));
-
     }
 
 }

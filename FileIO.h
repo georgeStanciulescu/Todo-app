@@ -18,8 +18,6 @@ namespace IO
     void changeTaskIO(std::vector<TaskManager::Task>& tasks,const char* taskID);
     std::vector<std::string> returnDateSubstrings(const std::string& date);
     DateInformation::DayMonthYear returnNumericDate(const std::string& date);
-    void recalculateDaysLeft(std::vector<TaskManager::Task>& tasks);
-    void recalculateDaysLeft(TaskManager::Task& task);
 
 }
 

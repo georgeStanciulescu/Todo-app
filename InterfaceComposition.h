@@ -10,6 +10,11 @@
 
 namespace InterfaceComposition
 {
+    struct TabContent {
+        ftxui::Components taskContent{};
+        std::vector<std::string> ids{};
+    };
+
     ftxui::Element makeVbox(const std::string& first);
     ftxui::Element listTableCreation(const std::vector<TaskManager::Task>& tasks);
     void tableDataCalculations(const std::vector<TaskManager::Task>& tasks,std::vector<ftxui::Elements>& tableContent);
@@ -17,7 +22,11 @@ namespace InterfaceComposition
     ftxui::Element progressBarCreation(const std::vector<TaskManager::Task>& tasks);
     void fillTableValues(const TaskManager::Task& task,ftxui::Elements& values,const ftxui::Color& colour);
     void tabStatsCreation(const std::vector<TaskManager::Task>& tasks);
+    TabContent createTabContent(const std::vector<TaskManager::Task> &tasks);
+    ftxui::Element createStatusBox(char completion);
+    ftxui::Elements createExtraPadding(std::size_t descriptionSize);
     ftxui::Element createListInfoWindow();
+    std::string_view lateOrLeft(int daysLeft);
 }
 
 #endif //UNTITLED_INTERFACECOMPOSITION_H

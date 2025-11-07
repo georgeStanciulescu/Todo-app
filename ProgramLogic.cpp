@@ -1,9 +1,6 @@
 #include <ProgramLogic.h>
 #include <ErrorHandling.h>
 #include <Interface.h>
-#include <iostream>
-
-
 #include "Constants.h"
 
 ProgramResult programLogic(const int argc,char* argv[])
