@@ -43,23 +43,17 @@ namespace IO
         }
     }
 
-    TaskManager::Task taskReader(std::string& myTask,int count)
+    TaskManager::Task taskReader(const std::string& myTask,int count)
     {
         std::istringstream stream{myTask};
-        std::string garbage{};
 
-        int id{};
-        if (!(stream >> id)){Interface::exceptionErrorMessage(ErrorHandling::id,count);}
-
-        if (!std::getline(stream,garbage,Constants::pipeDelimiter))
-         {
+        std::string status{};
+        if ( !std::getline(stream,status,Constants::pipeDelimiter)) {
             Interface::exceptionErrorMessage(ErrorHandling::status,count);
         }
-        char status{};
-        if (!(stream >> status)){Interface::exceptionErrorMessage(ErrorHandling::status,count);}
 
         std::string startDate{};
-        if (!std::getline(stream,garbage,Constants::pipeDelimiter) || !std::getline(stream,startDate,Constants::pipeDelimiter))
+        if (!std::getline(stream,startDate,Constants::pipeDelimiter))
         {
             Interface::exceptionErrorMessage(ErrorHandling::startDate,count);
         }
@@ -95,48 +89,32 @@ namespace IO
             Interface::exceptionErrorMessage(ErrorHandling::description,count);
         }
 
-        return {id,description,status,startDate,dueDate,
+        return {count,description,status[0],startDate,dueDate,
       presentToDueDate,endDate,startDateEndDateDifference,dueDateEndDateDifference};
     }
 
 
     void deleteAllTasksIO() {
-        std::filesystem::remove(static_cast<std::string>(Constants::fileName).c_str());
+        std::ofstream{static_cast<std::string>(Constants::fileName), std::ios::trunc};
     }
 
     void deleteTasksIO(std::vector<TaskManager::Task> &tasks,const std::vector<int>& tasksIDs)
     {
-        using namespace Constants;
+        auto ids{tasksIDs};
+        std::ranges::sort(ids);
 
-        std::filesystem::path tempPath{"temp.txt"};
-        std::ofstream tempFile(tempPath);
-
-        const std::unordered_set<int> ids{tasksIDs.begin(),tasksIDs.end()};
-
-        int deletionCounter{0};
-        for (std::size_t x{0}; x < tasks.size(); ++x)
-        {
-            if (!ids.contains(x + 1)) {
-                tempFile  << (x +1) - deletionCounter << pipeDelimiter <<  tasks[x].completion << pipeDelimiter
-                                   << tasks[x].date << pipeDelimiter << tasks[x].dueDate << pipeDelimiter
-                                   << tasks[x].daysLeft << pipeDelimiter << tasks[x].endDate
-                                   << pipeDelimiter <<tasks[x].startDateEndDateDifference << pipeDelimiter
-                                   << tasks[x].dueDateEndDateDifference << pipeDelimiter << tasks[x].description << '\n';
-            }
-            else{++deletionCounter;}
+        int deletionCounter{-1};
+        for (const auto& id :ids) {
+            tasks.erase(tasks.begin() + (id+deletionCounter));
+            --deletionCounter;
         }
 
-        std::filesystem::rename(tempPath,fileName);
+        writeToFile(tasks);
     }
 
-    void endTaskIO(const std::vector<TaskManager::Task> &tasks,const char *taskID, const char *status,
+    void endTaskIO(std::vector<TaskManager::Task> &tasks,const char *taskID, const char *status,
                    const std::string& startDateString,const std::string& dueDateString)
     {
-        using namespace Constants;
-
-        std::filesystem::path tempPath{"temp.txt"};
-        std::ofstream tempFile(tempPath);
-
         const auto taskEndDate{endDateDropdown(startDateString)};
         const auto taskEndDateString{std::format("{}/{}/{}",taskEndDate.day,taskEndDate.month,taskEndDate.year)};
 
@@ -146,78 +124,48 @@ namespace IO
         const auto startEndDifference{returnDateDifference(taskStartDate,taskEndDate)};
         const auto dueEndDifference{std::abs(returnDateDifference(taskDueDate,taskEndDate))};
 
-        const auto chosenTask{std::stoi(taskID)};
+        const auto chosenTask{std::stoi(taskID) - 1};
 
-        const std::string_view endedTask{tasks[chosenTask - 1].description};
+        tasks[chosenTask].completion = *status;
+        tasks[chosenTask].endDate = taskEndDateString;
+        tasks[chosenTask].startDateEndDateDifference = std::to_string(startEndDifference);
+        tasks[chosenTask].dueDateEndDateDifference = std::to_string(dueEndDifference);
 
-        for (const auto &task: tasks)
-        {
-            if (task.id != chosenTask) {
-                tempFile  << task.id << pipeDelimiter << task.completion << pipeDelimiter
-                          << task.date << pipeDelimiter << task.dueDate << pipeDelimiter
-                          << task.daysLeft << pipeDelimiter << task.endDate<< pipeDelimiter
-                          << task.startDateEndDateDifference << pipeDelimiter
-                          << task.dueDateEndDateDifference << pipeDelimiter << task.description << '\n';
-            }
-            else
-            {
-                tempFile << task.id << pipeDelimiter << status << pipeDelimiter
-                         << task.date << pipeDelimiter << task.dueDate
-                         << pipeDelimiter << task.daysLeft << pipeDelimiter
-                         << taskEndDateString << pipeDelimiter << startEndDifference
-                         << pipeDelimiter << dueEndDifference << pipeDelimiter << endedTask << '\n';
-            }
-        }
-
-        std::filesystem::rename(tempPath,fileName);
+        writeToFile(tasks);
     }
 
-    void addTaskIO(const std::vector<TaskManager::Task> &tasks, char *argv[],int argc)
+    void addTaskIO(std::vector<TaskManager::Task> &tasks, char *argv[],int argc)
     {
         using namespace Constants;
-        //std::filesystem::path tempPath{"temp.txt"};
-        std::ofstream tempFile(static_cast<std::string>(fileName), std::ios::app);
 
         const auto dates = dateDropdown();
 
         const auto startDate = std::format("{}/{}/{}",dates[0].day ,dates[0].month ,dates[0].year);
         const auto endDate = std::format("{}/{}/{}",dates[1].day,dates[1].month ,dates[1].year);
 
-        tempFile << tasks.size() + 1 << pipeDelimiter << ongoingMark <<  pipeDelimiter << startDate
-                 <<  pipeDelimiter << endDate <<  pipeDelimiter << ' ' <<  pipeDelimiter
-                 << ' ' <<  pipeDelimiter << ' ' <<  pipeDelimiter << ' ' << pipeDelimiter;
-
+        std::string description{};
         for (int x{2}; x < argc; ++x) {
-            tempFile << argv[x] ;
+            description += argv[x];
+            description += " ";
         }
-        tempFile << '\n';
 
-        //std::filesystem::rename(tempPath,Constants::fileName);
+        tasks.emplace_back(tasks.size() + 1,description,ongoingMark,startDate,endDate,
+                    "","","","");
+
+        writeToFile(tasks);
     }
 
     void changeTaskIO(std::vector<TaskManager::Task> &tasks,const char *taskID)
     {
-
-        using namespace Constants;
-        std::filesystem::path tempPath{"temp.txt"};
-        std::ofstream tempFile(tempPath);
-
         const auto chosenTask{std::stoi(taskID) - 1};
+
         std::string descriptionToChange{tasks[chosenTask].description};
 
         Interface::changeTaskInput(descriptionToChange);
 
         tasks[chosenTask].description = descriptionToChange;
 
-        for (const auto &task: tasks)
-        {
-            tempFile << task.id << pipeDelimiter << task.completion << pipeDelimiter << task.date
-                     << pipeDelimiter << task.dueDate << pipeDelimiter  << task.daysLeft
-                     << pipeDelimiter << task.endDate << pipeDelimiter << task.startDateEndDateDifference
-                     << pipeDelimiter << task.dueDateEndDateDifference << pipeDelimiter << task.description << '\n';
-        }
-
-        std::filesystem::rename(tempPath,fileName);
+        writeToFile(tasks);
     }
 
     std::vector<std::string> returnDateSubstrings(const std::string& date)
@@ -234,6 +182,26 @@ namespace IO
     {
         const auto  dateSubstrings= returnDateSubstrings(date);
         return { std::stoi(dateSubstrings[0]),std::stoi(dateSubstrings[1]),std::stoi(dateSubstrings[2])};
+    }
+
+    void writeToFile(const std::vector<TaskManager::Task>& tasks)
+    {
+        using namespace Constants;
+
+        std::filesystem::path tempPath{"temp.txt"};
+        std::ofstream tempFile(tempPath);
+
+        for (const auto &task: tasks)
+        {
+            tempFile << task.completion << pipeDelimiter << task.date
+                     << pipeDelimiter << task.dueDate << pipeDelimiter  << task.daysLeft
+                     << pipeDelimiter << task.endDate << pipeDelimiter << task.startDateEndDateDifference
+                     << pipeDelimiter << task.dueDateEndDateDifference << pipeDelimiter << task.description << '\n';
+        }
+
+        std::filesystem::remove(fileName);
+        std::filesystem::rename(tempPath,fileName);
+
     }
 
 }

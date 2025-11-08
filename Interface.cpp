@@ -24,8 +24,7 @@ namespace Interface {
                     text(""),
                     text("[list] -- Presents the list of tasks") | bold,
                     text("[add] -- Add a task") | bold,
-                    text(
-                        "[end] -- Add a marker indicating completion,either success or failure")
+                    text("[end] -- Add a marker indicating completion,either success or failure")
                     | bold,
                     text("[change] -- Change a task") | bold,
                     text("[info] -- Information regarding the to do app") |
@@ -40,11 +39,13 @@ namespace Interface {
                 break;
             }
             case deletion: {
-                displayText(makeVbox("Task deletion form: task delete [ID] "));
+                displayText(vbox( text(""),
+                    text("Task deletion form: task delete [ID]"),
+                    text("Or you can chain several ids by using ',' between them : task delete [id,id,id]")) | bold);
                 break;
             }
             case change: {
-                displayText(makeVbox("Task deletion form: task change [ID] "));
+                displayText(makeVbox("Task change form: task change [ID] "));
                 break;
             }
             case end: {
@@ -61,8 +62,7 @@ namespace Interface {
                     text("") | bold,
                     paragraph(
                         "The purpose of the to do app is to log whatever task you would like to do.\n"
-                        "The app also tracks your progress;it allows you to change the tasks' description,to delete them if necessary,etc.\n"
-                        "Soon,I shall add further functionality,via date-keeping and -updating!")
+                        "The app also tracks your progress;it allows you to change the tasks' description,to delete them if necessary,etc.\n")
                     | bold
                 ));
                 break;

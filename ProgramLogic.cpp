@@ -1,6 +1,8 @@
 #include <ProgramLogic.h>
 #include <ErrorHandling.h>
 #include <Interface.h>
+#include <span>
+
 #include "Constants.h"
 
 ProgramResult programLogic(const int argc,char* argv[])
@@ -41,6 +43,7 @@ ProgramResult programLogic(const int argc,char* argv[])
             if (validator.deleteAllCheck(argv[2])) {
                 tasker.deleteAllTasks();
                 successMessage(deletion,TaskManager::DeletionType::all);
+                return success;
             }
 
             const auto ids = validator.deleteArgBreakdown(argv[2]);
