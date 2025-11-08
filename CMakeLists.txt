@@ -6,15 +6,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(ftxui QUIET)
 if(NOT ftxui_FOUND)
-    # Check if FTXUI directory exists locally
     if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/FTXUI")
         message(STATUS "Using local FTXUI directory")
         add_subdirectory(FTXUI EXCLUDE_FROM_ALL)
     else()
-        # Fallback: try FetchContent (requires network)
         include(FetchContent)
         
-        # Set offline mode if needed
         set(FETCHCONTENT_FULLY_DISCONNECTED ON CACHE BOOL "Disable FetchContent updates")
         
         FetchContent_Declare(ftxui
@@ -26,38 +23,21 @@ if(NOT ftxui_FOUND)
     endif()
 endif()
 
-add_executable(task task.cpp
-        TaskManager.h
-        TaskManager.cpp
-        Calculations.h
-        ErrorHandling.h
-        ErrorHandling.cpp
-        Constants.h
-        ProgramLogic.h
-        ProgramLogic.cpp
-        FileIO.h
-        FileIO.cpp
-        Interface.h
-        Interface.cpp
-        InterfaceComposition.h
-        InterfaceComposition.cpp
-        Date.h
-        Date.cpp
-        DateCreation.h
-        DateCreation.cpp)
+file(GLOB_RECURSE SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+file(GLOB_RECURSE HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
+
+add_executable(task ${SOURCES} ${HEADERS})
 
 set(CMAKE_BUILD_TYPE Debug)
 
-# Link FTXUI libraries - use explicit target name
 target_link_libraries(task 
   PRIVATE 
     ftxui::screen
     ftxui::dom 
     ftxui::component
 )
-target_include_directories(task PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(task PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
-# Set compiler flags
 target_compile_options(task PRIVATE
   $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -g>
   $<$<CXX_COMPILER_ID:Clang>:-Wall -Wextra -g>

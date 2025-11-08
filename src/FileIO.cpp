@@ -5,8 +5,6 @@
 #include <filesystem>
 #include <fstream>
 #include <TaskManager.h>
-#include <unordered_set>
-
 
 namespace IO
 {
@@ -112,7 +110,7 @@ namespace IO
         writeToFile(tasks);
     }
 
-    void endTaskIO(std::vector<TaskManager::Task> &tasks,const char *taskID, const char *status,
+    void endTaskIO(std::vector<TaskManager::Task> &tasks,const int taskID, const char *status,
                    const std::string& startDateString,const std::string& dueDateString)
     {
         const auto taskEndDate{endDateDropdown(startDateString)};
@@ -124,7 +122,7 @@ namespace IO
         const auto startEndDifference{returnDateDifference(taskStartDate,taskEndDate)};
         const auto dueEndDifference{std::abs(returnDateDifference(taskDueDate,taskEndDate))};
 
-        const auto chosenTask{std::stoi(taskID) - 1};
+        const auto chosenTask{taskID - 1};
 
         tasks[chosenTask].completion = *status;
         tasks[chosenTask].endDate = taskEndDateString;
@@ -155,9 +153,9 @@ namespace IO
         writeToFile(tasks);
     }
 
-    void changeTaskIO(std::vector<TaskManager::Task> &tasks,const char *taskID)
+    void changeTaskIO(std::vector<TaskManager::Task> &tasks,const int taskID)
     {
-        const auto chosenTask{std::stoi(taskID) - 1};
+        const auto chosenTask{taskID -1};
 
         std::string descriptionToChange{tasks[chosenTask].description};
 

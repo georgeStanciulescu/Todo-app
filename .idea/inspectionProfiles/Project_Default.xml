@@ -10,7 +10,7 @@
       </list>
     </option>
     <inspection_tool class="Cppcheck" enabled="true" level="WEAK WARNING" enabled_by_default="true" editorAttributes="INFO_ATTRIBUTES">
-      <scope name="Project Files" level="WARNING" enabled="true" editorAttributes="WARNING_ATTRIBUTES" />
+      <scope name="Project Files" level="WARNING" enabled="false" editorAttributes="WARNING_ATTRIBUTES" />
     </inspection_tool>
   </profile>
 </component>

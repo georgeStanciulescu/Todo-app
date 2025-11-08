@@ -47,9 +47,9 @@ public:
 
     void deleteAllTasks();
     void deleteTasks(const std::vector<int>& taskIDs);
-    void endTask(const char* taskID,const char* status,const std::string& startDate,const std::string& dueDate);
+    void endTask(int taskID,const char* status,const std::string& startDate,const std::string& dueDate);
     void addTask(char* argv[],int argc);
-    void changeTask(const char* taskID);
+    void changeTask(int taskID);
     void listSimple();
     void listDetailed();
     bool duplicateCheck(const char* duplicateArg);

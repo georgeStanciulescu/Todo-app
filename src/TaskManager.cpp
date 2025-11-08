@@ -20,17 +20,17 @@ void TaskManager::deleteAllTasks()
     IO::deleteAllTasksIO();
 }
 
-void TaskManager::endTask(const char* taskID,const char* status,const std::string& startDate,const std::string& dueDate)
+void TaskManager::endTask(const int taskID,const char* status,const std::string& startDate,const std::string& dueDate)
 {
     IO::endTaskIO(tasks,taskID,status,startDate,dueDate);
 }
 
-void TaskManager::addTask(char* argv[],int argc)
+void TaskManager::addTask(char* argv[],const int argc)
 {
     IO::addTaskIO(tasks,argv,argc);
 }
 
-void TaskManager::changeTask(const char* taskID)
+void TaskManager::changeTask(const int taskID)
 {
     IO::changeTaskIO(tasks,taskID);
 }
