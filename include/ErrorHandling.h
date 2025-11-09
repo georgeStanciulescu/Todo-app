@@ -1,11 +1,13 @@
 #ifndef UNTITLED_ERRORHANDLING_H
 #define UNTITLED_ERRORHANDLING_H
-#include <TaskManager.h>
 
-class ErrorHandling
-{
-public:
-    enum ErrorType
+#include <optional>
+#include <vector>
+#include <string_view>
+
+namespace ErrorHandling {
+
+    enum class ErrorType
     {
         id,
         description,
@@ -35,10 +37,15 @@ public:
         end
     };
 
+    struct ArgParseResult {
+        std::optional<ErrorType> errorType{};
+        std::vector<int> ids{};
+    };
+
     bool stringArgCheck(std::string_view arg,CommandType cmd);
-    std::vector<int> argBreakdown(const char* arg,int taskNumber) const;
+    ArgParseResult argBreakdown(const char* arg,int taskNumber);
     bool minArgs(int totalArgs,ArgCheck argCheck);
 
-};
+}
 
 #endif //UNTITLED_ERRORHANDLING_H

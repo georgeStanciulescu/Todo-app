@@ -11,16 +11,7 @@ namespace Constants
     inline constexpr char ongoingMark{'-'};
     inline constexpr char pipeDelimiter{'|'};
 
-    inline constexpr int minEndArgs{4};
-    inline constexpr int minStartArgs{2};
-    inline constexpr int minGeneralArgs{3};
-
-    inline constexpr int firstArg{0};
-    inline constexpr int secondArg{1};
-    inline constexpr int thirdArg{2};
-    inline constexpr int fourthArg{3};
-
-    constexpr std::string_view listASCII{R"(
+    inline constexpr std::string_view listASCII{R"(
   ██╗     ██╗███████╗████████╗
   ██║     ██║██╔════╝╚══██╔══╝
   ██║     ██║███████╗   ██║
@@ -28,7 +19,7 @@ namespace Constants
   ███████╗██║███████║   ██║
   ╚══════╝╚═╝╚══════╝   ╚═╝   )"};
 
-    constexpr std::string_view optionsASCII{ R"(
+    inline constexpr std::string_view optionsASCII{ R"(
    ██████╗ ██████╗ ████████╗██╗ ██████╗ ███╗   ██╗███████╗
   ██╔═══██╗██╔══██╗╚══██╔══╝██║██╔═══██╗████╗  ██║██╔════╝
   ██║   ██║██████╔╝   ██║   ██║██║   ██║██╔██╗ ██║███████╗

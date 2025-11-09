@@ -78,15 +78,11 @@ namespace Interface {
     }
 
     //might change;sending an int pointlessly when the user's not deleting
-    void successMessage(const TaskManager::DetailType type,const TaskManager::DeletionType deletionType)
+    void successMessage(const TaskManager::DetailType type)
     {
         using enum TaskManager::DetailType;
         using namespace InterfaceComposition;
         switch (type) {
-            case deletion: {
-                deletionMessage(deletionType);
-                break;
-            }
             case end:
                 displayText(makeVbox(
                     "The status of the task has been successfully updated!"));
@@ -247,7 +243,6 @@ namespace Interface {
         extraDetail(type);
         return false;
     }
-
 
 }
 

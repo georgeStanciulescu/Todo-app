@@ -10,18 +10,19 @@ namespace IO
 {
     void fileIO(std::vector<TaskManager::Task> &tasks)
     {
+        using enum ErrorHandling::ErrorType;
 
         if (!std::filesystem::exists(Constants::fileName)) {
             std::ofstream fileCreation(static_cast<std::string>(Constants::fileName));
             if (!fileCreation) {
-                Interface::exceptionErrorMessage(ErrorHandling::failedCreation,0);
+                Interface::exceptionErrorMessage(failedCreation,0);
             }
         }
 
         std::ifstream myFile(static_cast<std::string>(Constants::fileName));
 
         if (!myFile) {
-            Interface::exceptionErrorMessage(ErrorHandling::failedOpening,0);;
+            Interface::exceptionErrorMessage(failedOpening,0);;
         }
 
         int count{0};
@@ -43,48 +44,49 @@ namespace IO
 
     TaskManager::Task taskReader(const std::string& myTask,int count)
     {
+
         std::istringstream stream{myTask};
 
         std::string status{};
         if ( !std::getline(stream,status,Constants::pipeDelimiter)) {
-            Interface::exceptionErrorMessage(ErrorHandling::status,count);
+            Interface::exceptionErrorMessage(ErrorHandling::ErrorType::status,count);
         }
 
         std::string startDate{};
         if (!std::getline(stream,startDate,Constants::pipeDelimiter))
         {
-            Interface::exceptionErrorMessage(ErrorHandling::startDate,count);
+            Interface::exceptionErrorMessage(ErrorHandling::ErrorType::startDate,count);
         }
         std::string dueDate{};
 
         if (!std::getline(stream,dueDate,Constants::pipeDelimiter))
         {
-            Interface::exceptionErrorMessage(ErrorHandling::dueDate,count);
+            Interface::exceptionErrorMessage(ErrorHandling::ErrorType::dueDate,count);
         }
         std::string presentToDueDate{};
         if (!std::getline(stream,presentToDueDate,Constants::pipeDelimiter))
         {
-            Interface::exceptionErrorMessage(ErrorHandling::daysLeft,count);
+            Interface::exceptionErrorMessage(ErrorHandling::ErrorType::daysLeft,count);
         }
         std::string endDate{};
         if (!std::getline(stream,endDate,Constants::pipeDelimiter))
         {
-            Interface::exceptionErrorMessage(ErrorHandling::endDate,count);
+            Interface::exceptionErrorMessage(ErrorHandling::ErrorType::endDate,count);
         }
         std::string startDateEndDateDifference{};
         if (!std::getline(stream,startDateEndDateDifference,Constants::pipeDelimiter))
         {
-            Interface::exceptionErrorMessage(ErrorHandling::startDateEndDateDifference,count);
+            Interface::exceptionErrorMessage(ErrorHandling::ErrorType::startDateEndDateDifference,count);
         }
         std::string dueDateEndDateDifference{};
         if (!std::getline(stream,dueDateEndDateDifference,Constants::pipeDelimiter))
         {
-            Interface::exceptionErrorMessage(ErrorHandling::dueDateEndDateDifference,count);
+            Interface::exceptionErrorMessage(ErrorHandling::ErrorType::dueDateEndDateDifference,count);
         }
         std::string description{};
         if (!std::getline(stream,description))
         {
-            Interface::exceptionErrorMessage(ErrorHandling::description,count);
+            Interface::exceptionErrorMessage(ErrorHandling::ErrorType::description,count);
         }
 
         return {count,description,status[0],startDate,dueDate,
